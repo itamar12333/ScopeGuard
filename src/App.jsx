@@ -8,6 +8,32 @@ const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ─── DEMO DATA ────────────────────────────────────────────────────────────────
+const DEMO_ORG = { id:"demo", name:"Acme Corp (Demo)" };
+const DEMO_PROFILE = { id:"demo", org_id:"demo", full_name:"Alex Johnson", role:"ciso", language:"en" };
+const DEMO_PLATFORMS = [
+  { id:"p1", name:"GitHub", last_synced_at: new Date(Date.now()-3600000).toISOString() },
+  { id:"p2", name:"Slack", last_synced_at: new Date(Date.now()-7200000).toISOString() },
+];
+const DEMO_APPS = [
+  { id:"a1", name:"SlackBot Pro", platform:{name:"Slack"}, connection_type:"OAuth", risk_score:92, severity:"critical", verified:false, is_stale:false, is_revoked:false, users_affected:312, users_type:"users", connected_at:new Date(Date.now()-86400000*90).toISOString(), last_active_at:new Date(Date.now()-86400000*45).toISOString(), permissions:[{id:"p1",scope:"channels:history",is_high_risk:true},{id:"p2",scope:"files:read",is_high_risk:false},{id:"p3",scope:"admin",is_high_risk:true}], compliance:[] },
+  { id:"a2", name:"DeployHelper", platform:{name:"GitHub"}, connection_type:"OAuth", risk_score:88, severity:"critical", verified:false, is_stale:true, is_revoked:false, users_affected:5, users_type:"repos", connected_at:new Date(Date.now()-86400000*120).toISOString(), last_active_at:new Date(Date.now()-86400000*95).toISOString(), permissions:[{id:"p4",scope:"repo:write",is_high_risk:true},{id:"p5",scope:"admin:org",is_high_risk:true}], compliance:[{framework:{name:"SOC 2",short_code:"soc2"}}] },
+  { id:"a3", name:"DataSync360", platform:{name:"Slack"}, connection_type:"API Key", risk_score:74, severity:"high", verified:true, is_stale:false, is_revoked:false, users_affected:18000, users_type:"records", connected_at:new Date(Date.now()-86400000*60).toISOString(), last_active_at:new Date(Date.now()-86400000*2).toISOString(), permissions:[{id:"p6",scope:"contacts:read",is_high_risk:true},{id:"p7",scope:"channels:read",is_high_risk:false}], compliance:[{framework:{name:"GDPR",short_code:"gdpr"}}] },
+  { id:"a4", name:"Zoom", platform:{name:"Slack"}, connection_type:"OAuth", risk_score:65, severity:"high", verified:false, is_stale:false, is_revoked:false, users_affected:150, users_type:"users", connected_at:new Date(Date.now()-86400000*30).toISOString(), last_active_at:new Date(Date.now()-86400000*1).toISOString(), permissions:[{id:"p8",scope:"channels:write",is_high_risk:false},{id:"p9",scope:"users:read",is_high_risk:false}], compliance:[] },
+  { id:"a5", name:"MailChimp", platform:{name:"GitHub"}, connection_type:"OAuth", risk_score:61, severity:"high", verified:true, is_stale:false, is_revoked:false, users_affected:145, users_type:"users", connected_at:new Date(Date.now()-86400000*45).toISOString(), last_active_at:new Date(Date.now()-86400000*3).toISOString(), permissions:[{id:"p10",scope:"repo:read",is_high_risk:false},{id:"p11",scope:"emails:read",is_high_risk:true}], compliance:[{framework:{name:"SOC 2",short_code:"soc2"}},{framework:{name:"GDPR",short_code:"gdpr"}}] },
+  { id:"a6", name:"Figma", platform:{name:"Slack"}, connection_type:"OAuth", risk_score:28, severity:"low", verified:true, is_stale:false, is_revoked:false, users_affected:89, users_type:"users", connected_at:new Date(Date.now()-86400000*15).toISOString(), last_active_at:new Date(Date.now()-86400000*0.5).toISOString(), permissions:[{id:"p12",scope:"files:read",is_high_risk:false}], compliance:[] },
+  { id:"a7", name:"Notion", platform:{name:"GitHub"}, connection_type:"OAuth", risk_score:22, severity:"low", verified:true, is_stale:false, is_revoked:false, users_affected:67, users_type:"users", connected_at:new Date(Date.now()-86400000*20).toISOString(), last_active_at:new Date(Date.now()-86400000*1).toISOString(), permissions:[{id:"p13",scope:"repo:read",is_high_risk:false}], compliance:[] },
+];
+const DEMO_ALERTS = [
+  { id:"al1", app_id:"a1", title:"Unverified app with admin access to Slack", severity:"critical", detail:"SlackBot Pro is unverified and holds admin-level permissions across all channels.", tags:["unverified","admin"], compliance_ref:"SOC 2 CC6.1", status:"open" },
+  { id:"al2", app_id:"a2", title:"Stale GitHub token — no activity in 95 days", severity:"critical", detail:"DeployHelper has repo:write and admin:org access but has not been active in 95 days.", tags:["stale","write-access"], compliance_ref:"CC6.3", status:"open" },
+  { id:"al3", app_id:"a3", title:"App accessing 18,000 contact records", severity:"high", detail:"DataSync360 has access to 18,000 contact records. A DPA may be required under GDPR Art. 28.", tags:["gdpr","pii"], compliance_ref:"GDPR Art. 28", status:"open" },
+];
+const DEMO_REVS = [
+  { id:"r1", app_name:"OldTracker", platform:"GitHub", performed_by:"demo", performed_at:new Date(Date.now()-86400000*5).toISOString() },
+  { id:"r2", app_name:"TestBot", platform:"Slack", performed_by:"demo", performed_at:new Date(Date.now()-86400000*12).toISOString() },
+];
+
 // ─── TRANSLATIONS ─────────────────────────────────────────────────────────────
 const LANGS = {
   en: { dir:"ltr", dashboard:"Dashboard", inventory:"App Inventory", alerts:"Critical Alerts", permissions:"Permissions", revocations:"Revocation Log", addApp:"Add App", profile:"Profile", integrations:"Integrations", monitor:"Monitor", manage:"Manage", compliance:"Compliance", settings:"Settings", runScan:"Run Scan", exportPdf:"Export PDF", lastScan:"Last scan", minsAgo:"min ago", appsMonitored:"apps monitored", globalScore:"Global Security Score", connectedApps:"Connected Apps", complianceGaps:"Compliance Gaps", staleIntegrations:"Stale Integrations", criticalAlerts:"Critical Alerts", sensitiveAccess:"Sensitive Data Access", riskScore:"Risk Score", permissionsCol:"Permissions", users:"Users", actions:"Actions", revoke:"Revoke", review:"Review", dismiss:"Dismiss", revokeNow:"Revoke now", cancel:"Cancel", revokeTitle:"Revoke access?", revokeBody:"This will immediately disconnect {app} from {platform}. Cannot be undone.", revokedLabel:"Revoked", scanComplete:"Scan complete", criticalRisks:"critical risks found", noAlerts:"All alerts resolved — organization is clear!", noRevocations:"No revocations yet.", viewAll:"View all", platform:"Platform", connection:"Connection", verified:"Verified", lastActive:"Last active", connected:"Connected", activityLog:"Activity log", revokeAccess:"Revoke Access", accessRevoked:"Access revoked", showing:"Showing", of:"of", apps:"apps", sortedBy:"sorted by", search:"Search apps...", filterAll:"All", filterStale:"Stale", filterCritical:"Critical", filterHigh:"High", signIn:"Sign In", signOut:"Sign Out", createAccount:"Create Account", email:"Email address", password:"Password", fullName:"Full name", orgName:"Organization name", role:"Role", signingIn:"Signing in...", creatingAccount:"Creating account...", loginTitle:"Welcome back", loginSub:"Sign in to your security dashboard", registerTitle:"Create your account", registerSub:"Start securing your SaaS stack", controlsPassing:"Controls passing", appsAtRisk:"Apps at risk", risksResolved:"Risks resolved", openFindings:"Open findings", affectedApps:"Affected applications", noRisk:"No apps affecting", highRisk:"High-risk", activePerm:"Active", notGranted:"Not granted", language:"Language", noApps:"No apps yet. Connect a platform to start scanning.", itManager:"IT Manager", ciso:"CISO", auditor:"Auditor", loading:"Loading ScopeGuard...", connectPlatforms:"Connect Platforms", connectGithub:"Connect GitHub", connectSlack:"Connect Slack", connected:"Connected", scanning:"Scanning...", scanNow:"Scan Now", lastSynced:"Last synced", neverSynced:"Never synced", connectDesc:"Connect your platforms to automatically discover all third-party apps", profileTitle:"Profile Settings", editProfile:"Save Changes", saving:"Saving...", saved:"Saved!", displayName:"Display name", jobTitle:"Job title", emailNotif:"Email notifications", weeklyReport:"Weekly security report", criticalOnly:"Critical alerts only", appearance:"Appearance", darkMode:"Dark mode", compactView:"Compact view", dangerZone:"Danger zone", deleteAccount:"Delete account", appName:"App name", appPublisher:"Publisher", appConnType:"Connection type", appRiskScore:"Risk score", appUsersAff:"Users affected", appUsersType:"Users type", appVerified:"Publisher status", appStale:"Token status", appNotes:"Notes", addAppBtn:"Add Application", adding:"Adding...", appAdded:"Application added!" },
@@ -716,6 +742,7 @@ export default function App() {
   const [scanning, setScanning] = useState(false);
   const [scanningPlatform, setScanningPlatform] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("sg-dark")==="1");
+  const [isDemo, setIsDemo] = useState(false);
   const [selectedApps, setSelectedApps] = useState(new Set());
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardDone, setOnboardDone] = useState(() => localStorage.getItem("sg-onboarded")==="1");
@@ -754,7 +781,7 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => { if (session) load(); }, [session]);
+  useEffect(() => { if (session && !isDemo) load(); }, [session]);
 
   // Show onboarding for new users
   useEffect(() => {
@@ -859,7 +886,28 @@ export default function App() {
     document.body.style.background = darkMode ? "#060d1a" : "#f1f5f9";
   }, [darkMode]);
 
-  const doSignOut = async () => { await supabase.auth.signOut(); setSession(null); setApps([]); setAlerts([]); setRevs([]); setProfile(null); };
+  const enterDemo = () => {
+    setIsDemo(true);
+    setSession({ user: { id:"demo", email:"demo@scopeguard.io" } });
+    setProfile(DEMO_PROFILE);
+    setOrg(DEMO_ORG);
+    setApps(DEMO_APPS);
+    setAlerts(DEMO_ALERTS);
+    setRevs(DEMO_REVS);
+    setPlatforms(DEMO_PLATFORMS);
+    setAppLoading(false);
+  };
+
+  const doSignOut = async () => {
+    if (isDemo) {
+      setIsDemo(false);
+      setSession(null);
+      setApps([]); setAlerts([]); setRevs([]); setProfile(null); setOrg(null); setPlatforms([]);
+      return;
+    }
+    await supabase.auth.signOut();
+    setSession(null); setApps([]); setAlerts([]); setRevs([]); setProfile(null);
+  };
 
   const bulkRevoke = async () => {
     const toRevoke = apps.filter(a => selectedApps.has(a.id) && !a.is_revoked);
@@ -939,6 +987,14 @@ export default function App() {
 
   const revokeApp = async app => {
     if (!app) return;
+    if (isDemo) {
+      setApps(prev => prev.map(a => a.id===app.id ? {...a, is_revoked:true} : a));
+      setAlerts(prev => prev.filter(a => a.app_id!==app.id));
+      setRevs(prev => [{id:"r"+Date.now(), app_name:app.name, platform:app.platform?.name, performed_by:"demo", performed_at:new Date().toISOString()}, ...prev]);
+      setModal(null); setDetailApp(null);
+      showToast(`✓ ${app.name} revoked`);
+      return;
+    }
     await supabase.from("connected_apps").update({ is_revoked:true, revoked_at:new Date().toISOString(), revoked_by:session.user.id }).eq("id", app.id);
     await supabase.from("revocation_log").insert({ org_id:profile.org_id, app_id:app.id, app_name:app.name, platform:app.platform?.name, performed_by:session.user.id });
     await supabase.from("alerts").update({ status:"resolved", resolved_at:new Date().toISOString() }).eq("app_id", app.id);
@@ -1090,6 +1146,9 @@ export default function App() {
           <button className="btn-google" onClick={doGoogleSignIn} disabled={authBusy}>
             <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
             Continue with Google
+          </button>
+          <button onClick={enterDemo} style={{width:"100%",marginTop:10,padding:"12px",borderRadius:12,border:"1.5px dashed rgba(16,185,129,.4)",background:"rgba(16,185,129,.06)",color:"#10b981",fontSize:14,fontWeight:700,cursor:"pointer",transition:".15s",display:"flex",alignItems:"center",justifyContent:"center",gap:8}} onMouseOver={e=>e.target.style.background="rgba(16,185,129,.12)"} onMouseOut={e=>e.target.style.background="rgba(16,185,129,.06)"}>
+            🚀 Try Demo — no account needed
           </button>
           <div className="auth-langs">{Object.entries(LANG_NAMES).map(([k,v])=><button key={k} className={`auth-lang-btn ${lang===k?"active":""}`} onClick={()=>changeLang(k)}>{v}</button>)}</div>
         </div>
@@ -1930,6 +1989,14 @@ export default function App() {
           </div>
         </div>
         <div className="sb-footer">
+          {isDemo && (
+            <div style={{background:"linear-gradient(135deg,rgba(167,139,250,.15),rgba(16,185,129,.1))",border:"1px solid rgba(167,139,250,.3)",borderRadius:10,padding:"10px 12px",marginBottom:10,textAlign:"center"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#a78bfa",marginBottom:6}}>🚀 Demo Mode</div>
+              <button onClick={()=>doSignOut()} style={{width:"100%",padding:"7px",borderRadius:7,border:"none",background:"linear-gradient(135deg,#a78bfa,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>
+                Create Free Account →
+              </button>
+            </div>
+          )}
           <div className="sb-user">
             <div className="sb-av" onClick={()=>setPage("profile")} style={{overflow:"hidden",padding:0,flexShrink:0}}>
               {(() => {
@@ -1950,9 +2017,15 @@ export default function App() {
 
       <div className="content">
         <div className="topbar">
+          {isDemo && (
+            <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"linear-gradient(90deg,#a78bfa,#10b981,#a78bfa)",backgroundSize:"200% 100%",animation:"shimmerBrand 2s linear infinite"}}/>
+          )}
           <div className="tb-l">
             <div className="tb-title">{pageTitles[page]||page}</div>
-            <div className="tb-sub"><span className="tb-pulse"/>{scanning?"Scanning...":`${t.lastScan}: ${scanMin} ${t.minsAgo} · ${apps.length} ${t.appsMonitored}`}</div>
+            <div className="tb-sub">
+              <span className="tb-pulse"/>
+              {isDemo ? <span style={{color:"#a78bfa",fontWeight:700}}>🚀 Demo Mode — data is simulated</span> : `${t.lastScan}: ${scanMin} ${t.minsAgo} · ${apps.length} ${t.appsMonitored}`}
+            </div>
           </div>
           <div className="tb-r">
             <button className="btn-sec" onClick={toggleDark} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
