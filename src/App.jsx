@@ -741,7 +741,15 @@ export default function App() {
   const [scanMin, setScanMin] = useState(4);
   const [scanning, setScanning] = useState(false);
   const [scanningPlatform, setScanningPlatform] = useState(null);
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("sg-dark")==="1");
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem("sg-dark");
+    const isDark = saved === null ? true : saved === "1";
+    // Apply immediately to avoid flash
+    if (isDark) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+    document.body.style.background = isDark ? "#060d1a" : "#f1f5f9";
+    return isDark;
+  });
   const [isDemo, setIsDemo] = useState(false);
   const [selectedApps, setSelectedApps] = useState(new Set());
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -764,18 +772,16 @@ export default function App() {
       window.history.replaceState({}, "", window.location.pathname);
     }
 
-    // onAuthStateChange handles SIGNED_IN from hash/code automatically
+    let loaded = false;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       if (s) setSession(s);
-      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-        setAppLoading(false);
-      }
+      if (!loaded) { loaded = true; setAppLoading(false); }
     });
 
-    // Also check existing session
+    // Fallback — ensure we load even if onAuthStateChange doesn't fire
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       if (s) setSession(s);
-      setAppLoading(false);
+      if (!loaded) { loaded = true; setAppLoading(false); }
     });
 
     return () => subscription.unsubscribe();
@@ -879,12 +885,8 @@ export default function App() {
     setDarkMode(next);
     localStorage.setItem("sg-dark", next ? "1" : "0");
     document.documentElement.classList.toggle("dark", next);
+    document.body.style.background = next ? "#060d1a" : "#f1f5f9";
   };
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-    document.body.style.background = darkMode ? "#060d1a" : "#f1f5f9";
-  }, [darkMode]);
 
   const enterDemo = () => {
     setIsDemo(true);
@@ -1923,6 +1925,9 @@ export default function App() {
     <div className={`shell ${t.dir==="rtl"?"rtl-layout":"ltr-layout"}`} dir={t.dir}>
       <aside className="sidebar">
         <div className="sb-brand">
+          {isDemo && (
+            <div style={{position:"absolute",top:0,left:0,right:0,background:"linear-gradient(90deg,#a78bfa,#10b981)",height:3,zIndex:10}}/>
+          )}
           <div className="sb-logo">
             <svg viewBox="0 0 38 38" fill="none" width="38" height="38">
               <defs>
@@ -2016,15 +2021,18 @@ export default function App() {
       </aside>
 
       <div className="content">
-        <div className="topbar">
+        <div className="topbar" style={{position:"relative"}}>
           {isDemo && (
-            <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"linear-gradient(90deg,#a78bfa,#10b981,#a78bfa)",backgroundSize:"200% 100%",animation:"shimmerBrand 2s linear infinite"}}/>
+            <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,#a78bfa,#10b981,#a78bfa)",backgroundSize:"200% 100%",animation:"shimmerBrand 2s linear infinite"}}/>
           )}
           <div className="tb-l">
             <div className="tb-title">{pageTitles[page]||page}</div>
             <div className="tb-sub">
               <span className="tb-pulse"/>
-              {isDemo ? <span style={{color:"#a78bfa",fontWeight:700}}>🚀 Demo Mode — data is simulated</span> : `${t.lastScan}: ${scanMin} ${t.minsAgo} · ${apps.length} ${t.appsMonitored}`}
+              {isDemo
+                ? <><span style={{background:"rgba(167,139,250,.15)",border:"1px solid rgba(167,139,250,.3)",borderRadius:6,padding:"1px 8px",color:"#a78bfa",fontWeight:700,fontSize:10}}>DEMO</span> Data is simulated — <span style={{color:"#10b981",cursor:"pointer",fontWeight:700}} onClick={doSignOut}>Create free account →</span></>
+                : `${t.lastScan}: ${scanMin} ${t.minsAgo} · ${apps.length} ${t.appsMonitored}`
+              }
             </div>
           </div>
           <div className="tb-r">
