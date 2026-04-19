@@ -6,7 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -1302,44 +1301,37 @@ export default function App() {
             <button className="lp-cta-sec" onClick={enterDemo}>🚀 Try live demo</button>
           </div>
           <div className="lp-stats">
-            {(()=>{
-              const stats = [
-                {end:137, suffix:"", label:"avg apps per company"},
-                {end:68, suffix:"%", label:"never audited"},
-                {end:4.5, suffix:"M", prefix:"$", label:"avg cost of SaaS breach", isFloat:true},
-                {end:90, suffix:"s", label:"to first scan"},
-              ];
-              return stats.map(({end,suffix,prefix="",label,isFloat})=>{
-                const [val,setVal] = React.useState(0);
-                const [started,setStarted] = React.useState(false);
-                const ref = React.useRef(null);
-                React.useEffect(()=>{
-                  const obs = new IntersectionObserver(([e])=>{if(e.isIntersecting&&!started){setStarted(true);}},{threshold:0.5});
+            {[
+              {end:137, suffix:"", prefix:"", label:"avg apps per company"},
+              {end:68, suffix:"%", prefix:"", label:"never audited"},
+              {end:4.5, suffix:"M", prefix:"$", label:"avg cost of SaaS breach", isFloat:true},
+              {end:90, suffix:"s", prefix:"", label:"to first scan"},
+            ].map(({end,suffix,prefix,label,isFloat})=>{
+              const AnimStat = () => {
+                const [val,setVal] = useState(0);
+                const [started,setStarted] = useState(false);
+                const ref = useRef(null);
+                useEffect(()=>{
+                  const obs = new IntersectionObserver(([e])=>{if(e.isIntersecting)setStarted(true)},{threshold:0.5});
                   if(ref.current) obs.observe(ref.current);
                   return ()=>obs.disconnect();
                 },[]);
-                React.useEffect(()=>{
+                useEffect(()=>{
                   if(!started) return;
-                  let start = 0;
-                  const duration = 1800;
-                  const step = 16;
-                  const steps = duration/step;
+                  let cur = 0;
+                  const steps = 60;
                   const inc = end/steps;
                   const timer = setInterval(()=>{
-                    start += inc;
-                    if(start >= end){ setVal(end); clearInterval(timer); }
-                    else setVal(isFloat ? Math.round(start*10)/10 : Math.floor(start));
-                  }, step);
+                    cur += inc;
+                    if(cur >= end){ setVal(end); clearInterval(timer); }
+                    else setVal(isFloat ? Math.round(cur*10)/10 : Math.floor(cur));
+                  }, 25);
                   return ()=>clearInterval(timer);
                 },[started]);
-                return (
-                  <div key={label} ref={ref}>
-                    <div className="lp-stat-n">{prefix}{isFloat?val.toFixed(1):val}{suffix}</div>
-                    <div className="lp-stat-l">{label}</div>
-                  </div>
-                );
-              });
-            })()}
+                return <div ref={ref}><div className="lp-stat-n">{prefix}{isFloat?val.toFixed(1):val}{suffix}</div><div className="lp-stat-l">{label}</div></div>;
+              };
+              return <AnimStat key={label}/>;
+            })}
           </div>
         </div>
 
