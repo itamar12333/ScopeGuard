@@ -1151,10 +1151,10 @@ export default function App() {
         .lp-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 6%;border-bottom:1px solid rgba(255,255,255,.06)}
         .lp-nav-logo{display:flex;align-items:center;gap:10px}
         .lp-nav-brand{font-size:20px;font-weight:900;letter-spacing:-.5px;color:#fff}
-        .lp-nav-btns{display:flex;gap:10px}
-        .lp-btn-out{padding:9px 22px;border-radius:9px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.7);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+        .lp-nav-btns{display:flex;gap:8px;align-items:center}
+        .lp-btn-out{padding:8px 16px;border-radius:9px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.7);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap}
         .lp-btn-out:hover{border-color:rgba(255,255,255,.3);color:#fff}
-        .lp-btn-pri{padding:9px 22px;border-radius:9px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+        .lp-btn-pri{padding:8px 16px;border-radius:9px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap}
         .lp-btn-pri:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,185,129,.35)}
         .lp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 6% 70px;position:relative}
         .lp-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 16px;border-radius:20px;border:1px solid rgba(167,139,250,.3);background:rgba(167,139,250,.08);font-size:12px;font-weight:600;color:#a78bfa;margin-bottom:28px}
@@ -1179,7 +1179,23 @@ export default function App() {
         .lp-footer{padding:28px 6%;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
         .lp-footer-brand{font-size:14px;font-weight:700;color:rgba(255,255,255,.4)}
         .lp-footer-copy{font-size:12px;color:rgba(255,255,255,.2)}
-        @media(max-width:768px){.lp-features{grid-template-columns:1fr}.lp-stats{gap:24px}.lp-nav-btns{gap:6px}}
+        @media(max-width:768px){
+          .lp-features{grid-template-columns:1fr}
+          .lp-stats{gap:20px}
+          .lp-nav{padding:12px 4%}
+          .lp-nav-brand{font-size:16px}
+          .lp-nav-btns{gap:6px}
+          .lp-btn-out{padding:7px 12px;font-size:12px}
+          .lp-btn-pri{padding:7px 12px;font-size:12px}
+          .lp-h1{font-size:32px;letter-spacing:-1px}
+          .lp-hero{padding:50px 5% 40px}
+          .lp-sub{font-size:14px}
+          .lp-cta-pri,.lp-cta-sec{padding:12px 24px;font-size:14px}
+          .lp-stat-n{font-size:28px}
+          .lp-stat-l{font-size:10px}
+          .lp-features{padding:40px 4%}
+          .lp-feat{padding:18px}
+        }
       `}</style></style>
       <div className="lp">
         {/* NAV */}
@@ -1247,8 +1263,17 @@ export default function App() {
       <><style>{CSS}</style>
       <div className={`auth-wrap ${t.dir==="rtl"?"rtl-layout":"ltr-layout"}`} dir={t.dir}>
         <div className="auth-card">
-          <button onClick={()=>setShowLanding(true)} style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.1)",color:"rgba(255,255,255,.7)",fontSize:12,fontWeight:600,cursor:"pointer",padding:"7px 14px",borderRadius:8,marginBottom:20,transition:".15s"}} onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,.1)"} onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,.06)"}>
-            ← Back to home
+          <button onClick={()=>setShowLanding(true)} style={{
+            display:"inline-flex",alignItems:"center",gap:6,
+            background:"rgba(255,255,255,.06)",
+            border:"1px solid rgba(255,255,255,.12)",
+            color:"rgba(255,255,255,.6)",fontSize:12,fontWeight:600,
+            cursor:"pointer",padding:"6px 12px 6px 10px",
+            borderRadius:20,marginBottom:20,transition:".15s",
+            letterSpacing:".01em"
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Home
           </button>
           <div className="auth-logo">
             <div className="auth-sh">
@@ -2170,7 +2195,21 @@ export default function App() {
             <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,#a78bfa,#10b981,#a78bfa)",backgroundSize:"200% 100%",animation:"shimmerBrand 2s linear infinite"}}/>
           )}
           <div className="tb-l">
-            <div className="tb-title">{pageTitles[page]||page}</div>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              {page !== "dashboard" && (
+                <button onClick={()=>setPage("dashboard")} style={{
+                  display:"flex",alignItems:"center",gap:4,
+                  background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.1)",
+                  color:"rgba(255,255,255,.5)",fontSize:11,fontWeight:600,
+                  cursor:"pointer",padding:"4px 8px 4px 6px",borderRadius:16,
+                  transition:".15s",flexShrink:0
+                }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  <span className="hide-mobile">Back</span>
+                </button>
+              )}
+              <div className="tb-title">{pageTitles[page]||page}</div>
+            </div>
             <div className="tb-sub">
               <span className="tb-pulse"/>
               {isDemo
