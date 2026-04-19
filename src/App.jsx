@@ -1262,76 +1262,140 @@ export default function App() {
 
     const isReg = authMode==="register";
     return (
-      <><style>{CSS}</style>
-      <div className={`auth-wrap ${t.dir==="rtl"?"rtl-layout":"ltr-layout"}`} dir={t.dir} style={{alignItems:"flex-start"}}>
-        <div className="auth-card" style={{marginTop:0}}>
-          <button onClick={()=>setShowLanding(true)} style={{
-            display:"flex",alignItems:"center",gap:7,
-            background:"rgba(16,185,129,.08)",
-            border:"1px solid rgba(16,185,129,.2)",
-            color:"#10b981",fontSize:12,fontWeight:700,
-            cursor:"pointer",padding:"8px 14px",
-            borderRadius:20,marginBottom:22,transition:".15s",
-            width:"fit-content"
-          }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-            ← Home
+      <><style>{CSS}{`
+        .ma-wrap{min-height:100vh;min-height:100dvh;width:100%;background:#060d1a;display:flex;flex-direction:column;overflow-y:auto}
+        .ma-top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+        .ma-back{display:flex;align-items:center;gap:6px;background:transparent;border:none;color:rgba(255,255,255,.5);font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;transition:.15s}
+        .ma-back:hover{color:#10b981}
+        .ma-back svg{flex-shrink:0}
+        .ma-logo{display:flex;align-items:center;gap:8px}
+        .ma-logo-name{font-size:15px;font-weight:800;color:#fff}
+        .ma-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:28px 20px 40px}
+        .ma-card{width:100%;max-width:420px;display:flex;flex-direction:column;gap:0}
+        .ma-tabs{display:flex;background:rgba(255,255,255,.05);border-radius:12px;padding:4px;margin-bottom:24px;border:1px solid rgba(255,255,255,.07)}
+        .ma-tab{flex:1;padding:10px;border-radius:9px;border:none;background:transparent;color:rgba(255,255,255,.4);font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+        .ma-tab.on{background:rgba(255,255,255,.1);color:#fff}
+        .ma-title{font-size:26px;font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:4px;text-align:center}
+        .ma-sub{font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:24px}
+        .ma-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+        .ma-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+        .ma-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.07em}
+        .ma-inp{font-size:15px;padding:13px 14px;border-radius:11px;border:1.5px solid rgba(255,255,255,.09);background:rgba(255,255,255,.05);color:#fff;outline:none;transition:.15s;width:100%}
+        .ma-inp:focus{border-color:#10b981;background:rgba(255,255,255,.08)}
+        .ma-inp::placeholder{color:rgba(255,255,255,.2)}
+        .ma-sel{font-size:15px;padding:13px 14px;border-radius:11px;border:1.5px solid rgba(255,255,255,.09);background:rgba(255,255,255,.05);color:#fff;outline:none;width:100%;cursor:pointer}
+        .ma-sel option{background:#0d1626;color:#fff}
+        .ma-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;transition:.2s;letter-spacing:.01em}
+        .ma-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(16,185,129,.35)}
+        .ma-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+        .ma-err{font-size:12px;font-weight:600;color:#fca5a5;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:9px;padding:10px 14px;margin-top:10px}
+        .ma-or{display:flex;align-items:center;gap:12px;margin:16px 0;color:rgba(255,255,255,.2);font-size:12px}
+        .ma-or::before,.ma-or::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+        .ma-google{width:100%;padding:13px;border-radius:12px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:.15s;margin-bottom:10px}
+        .ma-google:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+        .ma-demo{width:100%;padding:13px;border-radius:12px;border:1.5px dashed rgba(16,185,129,.35);background:rgba(16,185,129,.05);color:#10b981;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
+        .ma-demo:hover{background:rgba(16,185,129,.1)}
+        .ma-langs{display:flex;justify-content:center;gap:5px;margin-top:20px;flex-wrap:wrap}
+        .ma-lang{font-size:11px;font-weight:600;padding:4px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.35);cursor:pointer;transition:.15s}
+        .ma-lang:hover{color:rgba(255,255,255,.7)}
+        .ma-lang.on{background:linear-gradient(135deg,#10b981,#059669);border-color:#10b981;color:#fff}
+        @media(max-width:768px){
+          .ma-field-row{grid-template-columns:1fr}
+          .ma-body{padding:20px 16px 36px}
+          .ma-title{font-size:22px}
+          .ma-inp,.ma-sel{font-size:16px;padding:12px 13px}
+          .ma-btn{padding:13px;font-size:15px}
+        }
+      `}</style>
+      <div className={`ma-wrap ${t.dir==="rtl"?"rtl-layout":"ltr-layout"}`} dir={t.dir}>
+        {/* TOP BAR */}
+        <div className="ma-top">
+          <button className="ma-back" onClick={()=>setShowLanding(true)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Home
           </button>
-          <div className="auth-logo">
-            <div className="auth-sh">
-              <svg viewBox="0 0 24 24" fill="none" width="30" height="30"><path d="M12 2L3 6v6c0 5 3.5 9.74 9 11 5.5-1.26 9-6 9-11V6L12 2z" fill="#fff" fillOpacity=".9"/><path d="M8 12l3 3 5-6" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <div className="ma-logo">
+            <svg viewBox="0 0 28 28" fill="none" width="24" height="24">
+              <defs><linearGradient id="mag1" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#a78bfa"/><stop offset="1" stopColor="#34d399"/></linearGradient></defs>
+              <rect x="1" y="1" width="26" height="26" rx="7" fill="#0e0d1f" stroke="url(#mag1)" strokeWidth=".8"/>
+              <path d="M14 3L6 7v7c0 5 4 9 8 10 4-1 8-5 8-10V7Z" fill="none" stroke="url(#mag1)" strokeWidth="1.2"/>
+              <path d="M9 11c0-2 8-2 8 0s-8 2-8 4 8 2 8 0" stroke="url(#mag1)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+            </svg>
+            <span className="ma-logo-name">ScopeGuard</span>
+          </div>
+        </div>
+
+        {/* FORM BODY */}
+        <div className="ma-body">
+          <div className="ma-card">
+            <div className="ma-tabs">
+              <button className={`ma-tab ${!isReg?"on":""}`} onClick={()=>{setAuthMode("login");setAuthErr("")}}>{t.signIn}</button>
+              <button className={`ma-tab ${isReg?"on":""}`} onClick={()=>{setAuthMode("register");setAuthErr("")}}>{t.createAccount}</button>
             </div>
-            <div className="auth-brand-col">
-              <div className="auth-bname">ScopeGuard</div>
-              <div className="auth-btag">SSPM Platform</div>
+
+            <div className="ma-title">{isReg ? t.registerTitle : t.loginTitle}</div>
+            <div className="ma-sub">{isReg ? t.registerSub : t.loginSub}</div>
+
+            <form onSubmit={isReg?doRegister:doSignIn}>
+              {isReg && <>
+                <div className="ma-field-row">
+                  <div className="ma-field">
+                    <label className="ma-lbl">{t.fullName}</label>
+                    <input className="ma-inp" type="text" placeholder="John Smith" value={fullName} onChange={e=>setFullName(e.target.value)} required/>
+                  </div>
+                  <div className="ma-field">
+                    <label className="ma-lbl">{t.orgName}</label>
+                    <input className="ma-inp" type="text" placeholder="Acme Corp" value={orgName} onChange={e=>setOrgName(e.target.value)} required/>
+                  </div>
+                </div>
+                <div className="ma-field">
+                  <label className="ma-lbl">{t.role}</label>
+                  <select className="ma-sel" value={roleVal} onChange={e=>setRoleVal(e.target.value)}>
+                    <option value="ciso">CISO</option>
+                    <option value="it_manager">IT Manager</option>
+                    <option value="it_admin">IT Administrator</option>
+                    <option value="security_analyst">Security Analyst</option>
+                    <option value="security_engineer">Security Engineer</option>
+                    <option value="devops_engineer">DevOps Engineer</option>
+                    <option value="cloud_architect">Cloud Security Architect</option>
+                    <option value="compliance_officer">Compliance Officer</option>
+                    <option value="auditor">Internal Auditor</option>
+                    <option value="vp_engineering">VP Engineering</option>
+                    <option value="cto">CTO</option>
+                    <option value="founder">Founder / CEO</option>
+                    <option value="read_only">Read Only</option>
+                  </select>
+                </div>
+              </>}
+              <div className="ma-field">
+                <label className="ma-lbl">{t.email}</label>
+                <input className="ma-inp" type="email" placeholder="you@company.com" value={email} onChange={e=>setEmail(e.target.value)} required autoFocus/>
+              </div>
+              <div className="ma-field">
+                <label className="ma-lbl">{t.password}</label>
+                <input className="ma-inp" type="password" placeholder="••••••••" value={pass} onChange={e=>setPass(e.target.value)} required minLength={6}/>
+              </div>
+              <button className="ma-btn" type="submit" disabled={authBusy}>
+                {authBusy ? (isReg ? t.creatingAccount : t.signingIn) : (isReg ? t.createAccount : t.signIn)}
+              </button>
+              {authErr && <div className="ma-err">{authErr}</div>}
+            </form>
+
+            <div className="ma-or">or</div>
+            <button className="ma-google" onClick={doGoogleSignIn} disabled={authBusy}>
+              <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+              Continue with Google
+            </button>
+            <button className="ma-demo" onClick={enterDemo}>
+              🚀 Try Demo — no account needed
+            </button>
+
+            <div className="ma-langs">
+              {Object.entries(LANG_NAMES).map(([k,v])=>(
+                <button key={k} className={`ma-lang ${lang===k?"on":""}`} onClick={()=>changeLang(k)}>{v}</button>
+              ))}
             </div>
           </div>
-          <div className="auth-tagline">🛡️ Protect every SaaS connection</div>
-          <div className="auth-tabs">
-            <button className={`auth-tab ${!isReg?"active":""}`} onClick={()=>{setAuthMode("login");setAuthErr("")}}>{t.signIn}</button>
-            <button className={`auth-tab ${isReg?"active":""}`} onClick={()=>{setAuthMode("register");setAuthErr("")}}>{t.createAccount}</button>
-          </div>
-          <div className="auth-title">{isReg?t.registerTitle:t.loginTitle}</div>
-          <div className="auth-sub">{isReg?t.registerSub:t.loginSub}</div>
-          <form onSubmit={isReg?doRegister:doSignIn}>
-            {isReg&&<>
-              <div className="auth-form-row">
-                <div className="f-group"><label className="f-lbl">{t.fullName}</label><input className="f-inp" type="text" placeholder="John Smith" value={fullName} onChange={e=>setFullName(e.target.value)} required/></div>
-                <div className="f-group"><label className="f-lbl">{t.orgName}</label><input className="f-inp" type="text" placeholder="Acme Corp" value={orgName} onChange={e=>setOrgName(e.target.value)} required/></div>
-              </div>
-              <div className="f-group" style={{marginBottom:14}}>
-                <label className="f-lbl">{t.role}</label>
-                <select className="f-sel" value={roleVal} onChange={e=>setRoleVal(e.target.value)}>
-                  <option value="ciso">CISO — Chief Information Security Officer</option>
-                  <option value="it_manager">IT Manager</option>
-                  <option value="it_admin">IT Administrator</option>
-                  <option value="security_analyst">Security Analyst</option>
-                  <option value="security_engineer">Security Engineer</option>
-                  <option value="devops_engineer">DevOps Engineer</option>
-                  <option value="cloud_architect">Cloud Security Architect</option>
-                  <option value="compliance_officer">Compliance Officer</option>
-                  <option value="auditor">Internal Auditor</option>
-                  <option value="vp_engineering">VP Engineering</option>
-                  <option value="cto">CTO — Chief Technology Officer</option>
-                  <option value="founder">Founder / CEO</option>
-                  <option value="read_only">Read Only (Guest)</option>
-                </select>
-              </div>
-            </>}
-            <div className="f-group" style={{marginBottom:14}}><label className="f-lbl">{t.email}</label><input className="f-inp" type="email" placeholder="you@company.com" value={email} onChange={e=>setEmail(e.target.value)} required autoFocus/></div>
-            <div className="f-group" style={{marginBottom:14}}><label className="f-lbl">{t.password}</label><input className="f-inp" type="password" placeholder="••••••••" value={pass} onChange={e=>setPass(e.target.value)} required minLength={6}/></div>
-            <button className="sub-btn" type="submit" disabled={authBusy}>{authBusy?(isReg?t.creatingAccount:t.signingIn):(isReg?t.createAccount:t.signIn)}</button>
-            {authErr&&<div className="auth-err">{authErr}</div>}
-          </form>
-          <div className="auth-divider">or</div>
-          <button className="btn-google" onClick={doGoogleSignIn} disabled={authBusy}>
-            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
-            Continue with Google
-          </button>
-          <button onClick={enterDemo} style={{width:"100%",marginTop:10,padding:"12px",borderRadius:12,border:"1.5px dashed rgba(16,185,129,.4)",background:"rgba(16,185,129,.06)",color:"#10b981",fontSize:14,fontWeight:700,cursor:"pointer",transition:".15s",display:"flex",alignItems:"center",justifyContent:"center",gap:8}} onMouseOver={e=>e.target.style.background="rgba(16,185,129,.12)"} onMouseOut={e=>e.target.style.background="rgba(16,185,129,.06)"}>
-            🚀 Try Demo — no account needed
-          </button>
-          <div className="auth-langs">{Object.entries(LANG_NAMES).map(([k,v])=><button key={k} className={`auth-lang-btn ${lang===k?"active":""}`} onClick={()=>changeLang(k)}>{v}</button>)}</div>
         </div>
       </div></>
     );
