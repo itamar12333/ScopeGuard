@@ -487,7 +487,7 @@ tbody tr.rev td{opacity:.35}
 .toast-icon{width:20px;height:20px;background:#10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
 
 /* AUTH */
-.auth-wrap{min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0f1e 0%,#064e3b 55%,#0a0f1e 100%);padding:24px;position:relative;overflow:hidden}
+.auth-wrap{min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0f1e 0%,#064e3b 55%,#0a0f1e 100%);padding:24px;position:relative;overflow-y:auto;overflow-x:hidden}
 .auth-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(16,185,129,.08) 0%,transparent 60%),radial-gradient(circle at 70% 50%,rgba(16,185,129,.05) 0%,transparent 60%);pointer-events:none}
 .auth-card{background:#0d1626;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:42px;width:100%;max-width:480px;box-shadow:0 32px 80px rgba(0,0,0,.5);animation:scaleIn .4s ease both;position:relative}
 .auth-logo{display:flex;align-items:center;gap:14px;margin-bottom:28px;justify-content:center}
@@ -656,9 +656,14 @@ tbody tr.rev td{opacity:.35}
   .onboard-card{padding:22px;width:94%;border-radius:18px}
   .onboard-title{font-size:19px}
   .dp{width:100%;border-left:none}
+  .auth-wrap{align-items:flex-start;padding:16px 14px 40px}
+  .auth-card{padding:24px 18px;border-radius:16px}
+  .auth-bname{font-size:20px}
+  .auth-title{font-size:20px}
+  .auth-sub{font-size:12px;margin-bottom:20px}
+  .auth-tabs{margin-bottom:16px}
   .bulk-bar{padding:8px 12px;gap:8px}
   .timeline-card{padding:14px}
-  .auth-card{padding:28px 20px;border-radius:18px}
 }
 
 /* RTL FULL SUPPORT */
@@ -2141,14 +2146,6 @@ export default function App() {
           </div>
         </div>
         <div className="sb-footer">
-          {isDemo && (
-            <div style={{background:"linear-gradient(135deg,rgba(167,139,250,.15),rgba(16,185,129,.1))",border:"1px solid rgba(167,139,250,.3)",borderRadius:10,padding:"10px 12px",marginBottom:10,textAlign:"center"}}>
-              <div style={{fontSize:11,fontWeight:700,color:"#a78bfa",marginBottom:6}}>🚀 Demo Mode</div>
-              <button onClick={()=>doSignOut()} style={{width:"100%",padding:"7px",borderRadius:7,border:"none",background:"linear-gradient(135deg,#a78bfa,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>
-                Create Free Account →
-              </button>
-            </div>
-          )}
           <div className="sb-user">
             <div className="sb-av" onClick={()=>setPage("profile")} style={{overflow:"hidden",padding:0,flexShrink:0}}>
               {(() => {
