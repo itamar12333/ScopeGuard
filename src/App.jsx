@@ -6,6 +6,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -589,31 +590,97 @@ tbody tr.rev td{opacity:.35}
 .notif-inp:focus{border-color:#10b981}
 
 /* MOBILE RESPONSIVE */
-@media(max-width:768px){
-  .shell{flex-direction:column}
-  .sidebar{width:100%;min-width:unset;height:auto;flex-direction:row;border-right:none;border-bottom:1px solid rgba(255,255,255,.05);overflow-x:auto}
-  .sb-brand{padding:12px 16px;border-bottom:none;border-right:1px solid rgba(255,255,255,.05);flex-shrink:0}
-  .sb-inner{flex-direction:row;overflow-x:auto;overflow-y:hidden;flex:1;min-width:0}
-  .sb-nav{padding:8px 6px;display:flex;flex-direction:row;overflow-x:auto;white-space:nowrap;gap:2px}
+.hide-mobile{display:inline}
+@media(max-width:768px){.hide-mobile{display:none}}
+  /* Shell layout — sidebar on top as bottom nav */
+  .shell{flex-direction:column;width:100vw;height:100vh}
+
+  /* Sidebar becomes bottom navigation bar */
+  .sidebar{
+    width:100%;min-width:unset;height:auto;
+    flex-direction:column;
+    border-right:none;border-top:1px solid rgba(255,255,255,.08);
+    order:2;flex-shrink:0;
+    background:linear-gradient(180deg,#0a1628,#060d1a);
+  }
+  .sb-brand{display:none}
+  .sb-inner{
+    flex-direction:row;overflow-x:auto;overflow-y:hidden;
+    flex:0;padding:4px 8px;
+    scrollbar-width:none;
+  }
+  .sb-inner::-webkit-scrollbar{display:none}
+  .sb-nav{
+    padding:4px 0;display:flex;flex-direction:row;
+    overflow-x:auto;white-space:nowrap;gap:2px;
+    scrollbar-width:none;flex:1;
+  }
+  .sb-nav::-webkit-scrollbar{display:none}
   .sb-sec{display:none}
-  .sb-link{padding:6px 10px;border-radius:7px;font-size:11px;white-space:nowrap;margin-bottom:0}
-  .sb-footer{border-top:none;border-left:1px solid rgba(255,255,255,.05);flex-shrink:0;padding:8px 12px}
+  .sb-link{
+    padding:6px 12px;border-radius:8px;
+    font-size:11px;font-weight:600;
+    white-space:nowrap;margin-bottom:0;
+    flex-direction:column;gap:2px;align-items:center;
+    min-width:60px;text-align:center;
+  }
+  .sb-icon{display:none}
+  .sb-badge{font-size:8px;padding:1px 4px}
+  .sb-footer{
+    border-top:1px solid rgba(255,255,255,.06);
+    padding:6px 12px;display:flex;align-items:center;
+    justify-content:space-between;
+  }
   .sb-lang{display:none}
   .sb-dm-row{display:none}
-  .content{height:calc(100vh - 120px)}
-  .kpi-row{grid-template-columns:1fr 1fr}
-  .mid-row{grid-template-columns:1fr}
+  .sb-uname{max-width:120px}
+
+  /* Content area */
+  .content{flex:1;min-height:0;order:1;height:auto}
+  .topbar{padding:0 14px;height:52px;flex-shrink:0}
+  .tb-title{font-size:15px}
+  .tb-r{gap:6px}
+  .btn-sec{padding:6px 10px;font-size:11px}
+  .btn-pri{padding:6px 14px;font-size:11px}
+  .scroll-area{padding:12px 12px 16px;gap:12px}
+
+  /* Demo topbar info — compact */
+  .tb-sub{font-size:10px}
+
+  /* KPI cards — 2 columns */
+  .kpi-row{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{padding:14px}
+  .kpi-val{font-size:26px}
+  .kpi-lbl{font-size:9px}
+  .ring{width:44px;height:44px}
+  .ring svg{width:44px;height:44px}
+
+  /* Mid row — single column */
+  .mid-row{grid-template-columns:1fr;gap:12px}
+
+  /* Table — hide less important cols */
+  .tbar{flex-direction:column;align-items:flex-start;gap:8px}
+  .filters{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .srch{width:130px;font-size:11px}
+  table{font-size:10px}
+  thead th,tbody td{padding:8px 8px}
+  /* Hide compliance column on mobile */
+  thead th:nth-child(6),tbody td:nth-child(6){display:none}
+
+  /* Other pages */
   .profile-grid{grid-template-columns:1fr}
   .guide-grid{grid-template-columns:1fr}
   .int-grid{grid-template-columns:1fr}
   .comp-2col{grid-template-columns:1fr}
   .add-app-grid{grid-template-columns:1fr}
   .form-grid{grid-template-columns:1fr}
-  .topbar{padding:0 14px;height:56px}
-  .scroll-area{padding:14px 14px 60px}
-  .tb-title{font-size:15px}
-  table{font-size:10px}
-  thead th,tbody td{padding:8px 10px}
+
+  /* Modals full-width */
+  .modal-box{width:95%;padding:20px}
+  .onboard-card{padding:24px;width:95%}
+
+  /* Detail panel full screen on mobile */
+  .dp{width:100%;border-left:none;border-top:1px solid var(--border)}
 }
 
 /* RTL FULL SUPPORT */
@@ -2139,15 +2206,16 @@ export default function App() {
           </div>
           <div className="tb-r">
             <button className="btn-sec" onClick={toggleDark} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
-              {darkMode ? "☀️ Light" : "🌙 Dark"}
+              {darkMode ? "☀️" : "🌙"}
+              <span className="hide-mobile">{darkMode ? " Light" : " Dark"}</span>
             </button>
             <button className="btn-sec" onClick={exportPDF} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
-              📄 {t.exportPdf}
+              📄<span className="hide-mobile"> {t.exportPdf}</span>
             </button>
-            <button className="btn-sec" onClick={()=>setShowOnboarding(true)} style={{fontSize:12}}>
+            <button className="btn-sec hide-mobile" onClick={()=>setShowOnboarding(true)} style={{fontSize:12}}>
               🚀 Setup
             </button>
-            <button className="btn-pri" onClick={doScan} disabled={scanning}>{scanning?"Scanning...":t.runScan}</button>
+            <button className="btn-pri" onClick={doScan} disabled={scanning}>{scanning?"...":t.runScan}</button>
           </div>
         </div>
         <div className="scroll-area"><PageContent/></div>
