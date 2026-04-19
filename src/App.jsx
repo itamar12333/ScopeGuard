@@ -1402,12 +1402,29 @@ export default function App() {
   }
 
   // ── TABLE ──
-  const AppTable = () => (
+  const AppTable = () => {
+    const [localQ, setLocalQ] = useState(q);
+    const inputRef = useRef(null);
+
+    // Sync to parent q with debounce
+    useEffect(() => {
+      const timer = setTimeout(() => setQ(localQ), 150);
+      return () => clearTimeout(timer);
+    }, [localQ]);
+
+    return (
     <div className="tcard">
       <div className="tbar">
         <span className="tbar-title">{t.inventory||"App Inventory"}</span>
         <div className="filters">
-          <input className="srch" placeholder={t.search} value={q} onChange={e=>setQ(e.target.value)}/>
+          <input
+            ref={inputRef}
+            className="srch"
+            placeholder={t.search}
+            value={localQ}
+            onChange={e => setLocalQ(e.target.value)}
+            autoComplete="off"
+          />
           <span className={`chip ${filter==="critical"?"chip-r":""}`} onClick={()=>setFilter(f=>f==="critical"?"all":"critical")}>{t.filterCritical}{critN>0?` (${critN})`:""}</span>
           <span className={`chip ${filter==="high"?"chip-a":""}`} onClick={()=>setFilter(f=>f==="high"?"all":"high")}>{t.filterHigh}</span>
           <span className={`chip ${filter==="all"&&!fsStale&&!fsSOC&&!fsGDPR?"chip-g":""}`} onClick={()=>{setFilter("all");setFsStale(false);setFsSOC(false);setFsGDPR(false)}}>{t.filterAll}</span>
@@ -1470,7 +1487,8 @@ export default function App() {
       </div>
       <div className="tfoot">{t.showing} {filtApps.length} {t.of} {apps.length} {t.apps} · {t.sortedBy} {sortCol}</div>
     </div>
-  );
+    );
+  };
 
   // ── COMP PAGE ──
   const CompPage = ({ fapps, framework, shortCode, controls }) => {
