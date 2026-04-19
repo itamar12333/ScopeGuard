@@ -715,6 +715,7 @@ export default function App() {
   const [appLoading, setAppLoading] = useState(true);
   const [authBusy, setAuthBusy] = useState(false);
   const [authErr, setAuthErr] = useState("");
+  const [showLanding, setShowLanding] = useState(true);
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [fullName, setFullName] = useState("");
@@ -767,21 +768,18 @@ export default function App() {
   const sec = active.length ? Math.max(0, Math.round(100 - active.reduce((s,a)=>s+(a.risk_score||0),0)/active.length)) : 0;
 
   useEffect(() => {
+    // Clean error params from URL
     const params = new URLSearchParams(window.location.search);
-    if (params.get("error")) {
-      window.history.replaceState({}, "", window.location.pathname);
-    }
+    if (params.get("error")) window.history.replaceState({}, "", window.location.pathname);
 
-    let loaded = false;
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
-      if (s) setSession(s);
-      if (!loaded) { loaded = true; setAppLoading(false); }
+    // Single auth check — getSession first, then listen for changes
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s || null);
+      setAppLoading(false);
     });
 
-    // Fallback — ensure we load even if onAuthStateChange doesn't fire
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      if (s) setSession(s);
-      if (!loaded) { loaded = true; setAppLoading(false); }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s || null);
     });
 
     return () => subscription.unsubscribe();
@@ -1093,11 +1091,114 @@ export default function App() {
 
   // ── AUTH ──
   if (!session) {
+    // ── LANDING PAGE ──
+    if (showLanding) return (
+      <><style>{CSS}<style>{`
+        .lp{min-height:100vh;background:linear-gradient(135deg,#060d1a 0%,#0a1628 50%,#061a10 100%);display:flex;flex-direction:column;font-family:'Inter',-apple-system,sans-serif;color:#fff;overflow-x:hidden}
+        .lp-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 6%;border-bottom:1px solid rgba(255,255,255,.06)}
+        .lp-nav-logo{display:flex;align-items:center;gap:10px}
+        .lp-nav-brand{font-size:20px;font-weight:900;letter-spacing:-.5px;color:#fff}
+        .lp-nav-btns{display:flex;gap:10px}
+        .lp-btn-out{padding:9px 22px;border-radius:9px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.7);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+        .lp-btn-out:hover{border-color:rgba(255,255,255,.3);color:#fff}
+        .lp-btn-pri{padding:9px 22px;border-radius:9px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+        .lp-btn-pri:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,185,129,.35)}
+        .lp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 6% 70px;position:relative}
+        .lp-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 16px;border-radius:20px;border:1px solid rgba(167,139,250,.3);background:rgba(167,139,250,.08);font-size:12px;font-weight:600;color:#a78bfa;margin-bottom:28px}
+        .lp-badge-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 2s ease-in-out infinite}
+        .lp-h1{font-size:clamp(38px,6vw,72px);font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:22px;max-width:820px}
+        .lp-h1 .gr{background:linear-gradient(135deg,#a78bfa,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .lp-sub{font-size:clamp(15px,2vw,19px);color:rgba(255,255,255,.55);max-width:540px;margin-bottom:40px;line-height:1.7}
+        .lp-ctas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:60px}
+        .lp-cta-pri{padding:14px 32px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:.2s}
+        .lp-cta-pri:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,185,129,.4)}
+        .lp-cta-sec{padding:14px 32px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.7);font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+        .lp-cta-sec:hover{border-color:rgba(255,255,255,.25);color:#fff}
+        .lp-stats{display:flex;gap:48px;padding:32px 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);flex-wrap:wrap;justify-content:center;width:100%;max-width:700px}
+        .lp-stat-n{font-size:38px;font-weight:900;background:linear-gradient(135deg,#10b981,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .lp-stat-l{font-size:11px;color:rgba(255,255,255,.35);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+        .lp-features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:60px 6%;max-width:1100px;margin:0 auto;width:100%}
+        .lp-feat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:26px;transition:.2s}
+        .lp-feat:hover{border-color:rgba(16,185,129,.25);transform:translateY(-3px)}
+        .lp-feat-ico{font-size:28px;margin-bottom:14px}
+        .lp-feat-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:8px}
+        .lp-feat-desc{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7}
+        .lp-footer{padding:28px 6%;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+        .lp-footer-brand{font-size:14px;font-weight:700;color:rgba(255,255,255,.4)}
+        .lp-footer-copy{font-size:12px;color:rgba(255,255,255,.2)}
+        @media(max-width:768px){.lp-features{grid-template-columns:1fr}.lp-stats{gap:24px}.lp-nav-btns{gap:6px}}
+      `}</style></style>
+      <div className="lp">
+        {/* NAV */}
+        <nav className="lp-nav">
+          <div className="lp-nav-logo">
+            <svg viewBox="0 0 36 36" fill="none" width="32" height="32">
+              <defs><linearGradient id="lng1" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#a78bfa"/><stop offset="1" stopColor="#34d399"/></linearGradient></defs>
+              <rect x="1" y="1" width="34" height="34" rx="9" fill="#0e0d1f" stroke="url(#lng1)" strokeWidth=".8"/>
+              <path d="M18 4L8 9v9c0 7 5 12 10 14 5-2 10-7 10-14V9Z" fill="none" stroke="url(#lng1)" strokeWidth="1.4"/>
+              <path d="M12 14c0-3 12-3 12 0s-12 3-12 6 12 3 12 0" stroke="url(#lng1)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+            </svg>
+            <span className="lp-nav-brand">ScopeGuard</span>
+          </div>
+          <div className="lp-nav-btns">
+            <button className="lp-btn-out" onClick={()=>{setShowLanding(false);setAuthMode("login")}}>Sign In</button>
+            <button className="lp-btn-pri" onClick={()=>{setShowLanding(false);setAuthMode("register")}}>Get Started Free →</button>
+          </div>
+        </nav>
+
+        {/* HERO */}
+        <div className="lp-hero">
+          <div className="lp-badge"><div className="lp-badge-dot"/>Real-time SaaS security scanning</div>
+          <h1 className="lp-h1">Know every app.<br/><span className="gr">Trust every connection.</span></h1>
+          <p className="lp-sub">ScopeGuard automatically discovers and monitors every third-party app connected to your company — and lets you revoke dangerous access in one click.</p>
+          <div className="lp-ctas">
+            <button className="lp-cta-pri" onClick={()=>{setShowLanding(false);setAuthMode("register")}}>Start securing for free →</button>
+            <button className="lp-cta-sec" onClick={enterDemo}>🚀 Try live demo</button>
+          </div>
+          <div className="lp-stats">
+            <div><div className="lp-stat-n">137</div><div className="lp-stat-l">avg apps per company</div></div>
+            <div><div className="lp-stat-n">68%</div><div className="lp-stat-l">never audited</div></div>
+            <div><div className="lp-stat-n">$4.5M</div><div className="lp-stat-l">avg cost of SaaS breach</div></div>
+            <div><div className="lp-stat-n">90s</div><div className="lp-stat-l">to first scan</div></div>
+          </div>
+        </div>
+
+        {/* FEATURES */}
+        <div className="lp-features">
+          {[
+            ["🔍","Auto Discovery","Connect Slack, GitHub, or Google Workspace and instantly discover every third-party app — no manual entry."],
+            ["⚠️","Real-time Risk Scoring","Every app gets a 0–100 risk score. Critical threats surface immediately with actionable alerts."],
+            ["⚡","One-click Revocation","Revoke dangerous app access instantly. Every action is logged with a full audit trail."],
+            ["📋","SOC 2 & GDPR Ready","Automatic mapping to compliance controls. Export audit reports for stakeholders in one click."],
+            ["🔔","Instant Alerts","Get notified via email or Slack the moment a critical or unverified app is detected."],
+            ["📊","Risk Timeline","Track your security score over time and show measurable improvement to leadership."],
+          ].map(([ico,title,desc])=>(
+            <div key={title} className="lp-feat">
+              <div className="lp-feat-ico">{ico}</div>
+              <div className="lp-feat-title">{title}</div>
+              <div className="lp-feat-desc">{desc}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* FOOTER */}
+        <footer className="lp-footer">
+          <span className="lp-footer-brand">🛡️ ScopeGuard — SSPM Platform</span>
+          <span className="lp-footer-copy">© 2026 ScopeGuard. All rights reserved.</span>
+        </footer>
+      </div></>
+    );
+
     const isReg = authMode==="register";
     return (
       <><style>{CSS}</style>
       <div className={`auth-wrap ${t.dir==="rtl"?"rtl-layout":"ltr-layout"}`} dir={t.dir}>
         <div className="auth-card">
+          <div style={{textAlign:"center",marginBottom:16}}>
+            <button onClick={()=>setShowLanding(true)} style={{background:"transparent",border:"none",color:"rgba(255,255,255,.4)",fontSize:12,cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5}}>
+              ← Back to home
+            </button>
+          </div>
           <div className="auth-logo">
             <div className="auth-sh">
               <svg viewBox="0 0 24 24" fill="none" width="30" height="30"><path d="M12 2L3 6v6c0 5 3.5 9.74 9 11 5.5-1.26 9-6 9-11V6L12 2z" fill="#fff" fillOpacity=".9"/><path d="M8 12l3 3 5-6" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
