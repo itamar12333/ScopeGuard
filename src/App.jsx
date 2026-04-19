@@ -100,7 +100,7 @@ html.dark{
 .sb-inner::-webkit-scrollbar{width:3px}
 .sb-inner::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
 .content{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
-.topbar{width:100%;background:var(--topbar);border-bottom:1px solid var(--border);padding:0 28px;height:66px;min-height:66px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 3px var(--shadow);transition:background .25s}
+.topbar{width:100%;background:var(--topbar);border-bottom:1px solid var(--border);padding:0 28px;height:66px;min-height:66px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 3px var(--shadow);transition:background .25s;overflow:hidden}
 .scroll-area{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:24px 28px 80px;display:flex;flex-direction:column;gap:20px}
 .scroll-area::-webkit-scrollbar{width:5px}
 .scroll-area::-webkit-scrollbar-track{background:transparent}
@@ -2195,41 +2195,26 @@ export default function App() {
             <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,#a78bfa,#10b981,#a78bfa)",backgroundSize:"200% 100%",animation:"shimmerBrand 2s linear infinite"}}/>
           )}
           <div className="tb-l">
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              {page !== "dashboard" && (
-                <button onClick={()=>setPage("dashboard")} style={{
-                  display:"flex",alignItems:"center",gap:4,
-                  background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.1)",
-                  color:"rgba(255,255,255,.5)",fontSize:11,fontWeight:600,
-                  cursor:"pointer",padding:"4px 8px 4px 6px",borderRadius:16,
-                  transition:".15s",flexShrink:0
-                }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-                  <span className="hide-mobile">Back</span>
-                </button>
-              )}
-              <div className="tb-title">{pageTitles[page]||page}</div>
-            </div>
+            <div className="tb-title">{pageTitles[page]||page}</div>
             <div className="tb-sub">
               <span className="tb-pulse"/>
               {isDemo
-                ? <><span style={{background:"rgba(167,139,250,.15)",border:"1px solid rgba(167,139,250,.3)",borderRadius:6,padding:"1px 6px",color:"#a78bfa",fontWeight:700,fontSize:9,flexShrink:0}}>DEMO</span><span className="hide-mobile" style={{color:"rgba(255,255,255,.4)"}}> · Data is simulated — </span><span style={{color:"#10b981",cursor:"pointer",fontWeight:700,fontSize:10,flexShrink:0}} onClick={doSignOut}>Create account →</span></>
-                : `${t.lastScan}: ${scanMin} ${t.minsAgo} · ${apps.length} ${t.appsMonitored}`
+                ? <><span style={{background:"rgba(167,139,250,.15)",border:"1px solid rgba(167,139,250,.3)",borderRadius:6,padding:"1px 6px",color:"#a78bfa",fontWeight:700,fontSize:9,flexShrink:0}}>DEMO</span><span style={{color:"#10b981",cursor:"pointer",fontWeight:700,fontSize:10,marginLeft:6}} onClick={doSignOut}>Create account →</span></>
+                : `${t.lastScan}: ${scanMin} ${t.minsAgo}`
               }
             </div>
           </div>
           <div className="tb-r">
-            <button className="btn-sec" onClick={toggleDark} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
-              {darkMode ? "☀️" : "🌙"}
-              <span className="hide-mobile">{darkMode ? " Light" : " Dark"}</span>
+            <button className="btn-sec hide-mobile" onClick={toggleDark} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
+              {darkMode ? "☀️ Light" : "🌙 Dark"}
             </button>
-            <button className="btn-sec" onClick={exportPDF} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
-              📄<span className="hide-mobile"> {t.exportPdf}</span>
+            <button className="btn-sec hide-mobile" onClick={exportPDF} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
+              📄 {t.exportPdf}
             </button>
             <button className="btn-sec hide-mobile" onClick={()=>setShowOnboarding(true)} style={{fontSize:12}}>
               🚀 Setup
             </button>
-            <button className="btn-pri" onClick={doScan} disabled={scanning}>{scanning?"...":t.runScan}</button>
+            <button className="btn-pri" onClick={doScan} disabled={scanning} style={{fontSize:12,padding:"7px 16px"}}>{scanning?"...":t.runScan}</button>
           </div>
         </div>
         <div className="scroll-area"><PageContent/></div>
