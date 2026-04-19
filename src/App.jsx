@@ -1197,11 +1197,9 @@ export default function App() {
       <><style>{CSS}</style>
       <div className={`auth-wrap ${t.dir==="rtl"?"rtl-layout":"ltr-layout"}`} dir={t.dir}>
         <div className="auth-card">
-          <div style={{textAlign:"center",marginBottom:16}}>
-            <button onClick={()=>setShowLanding(true)} style={{background:"transparent",border:"none",color:"rgba(255,255,255,.4)",fontSize:12,cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5}}>
-              ← Back to home
-            </button>
-          </div>
+          <button onClick={()=>setShowLanding(true)} style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.1)",color:"rgba(255,255,255,.7)",fontSize:12,fontWeight:600,cursor:"pointer",padding:"7px 14px",borderRadius:8,marginBottom:20,transition:".15s"}} onMouseOver={e=>e.currentTarget.style.background="rgba(255,255,255,.1)"} onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,.06)"}>
+            ← Back to home
+          </button>
           <div className="auth-logo">
             <div className="auth-sh">
               <svg viewBox="0 0 24 24" fill="none" width="30" height="30"><path d="M12 2L3 6v6c0 5 3.5 9.74 9 11 5.5-1.26 9-6 9-11V6L12 2z" fill="#fff" fillOpacity=".9"/><path d="M8 12l3 3 5-6" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
