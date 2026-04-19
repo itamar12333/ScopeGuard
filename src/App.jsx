@@ -6,7 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -1181,8 +1180,77 @@ export default function App() {
         .lp-footer{padding:28px 6%;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
         .lp-footer-brand{font-size:14px;font-weight:700;color:rgba(255,255,255,.4)}
         .lp-footer-copy{font-size:12px;color:rgba(255,255,255,.2)}
+        .lp-preview{padding:0 6% 60px;max-width:1100px;margin:0 auto;width:100%}
+        .lp-preview-win{background:#0a1628;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.5)}
+        .lp-preview-bar{height:40px;background:#060d1a;display:flex;align-items:center;padding:0 16px;gap:7px;border-bottom:1px solid rgba(255,255,255,.06)}
+        .lp-preview-dot{width:10px;height:10px;border-radius:50%}
+        .lp-preview-url{flex:1;margin:0 16px;height:22px;background:rgba(255,255,255,.05);border-radius:5px;display:flex;align-items:center;padding:0 10px;font-size:10px;color:rgba(255,255,255,.3);font-family:monospace}
+        .lp-preview-body{display:grid;grid-template-columns:170px 1fr;min-height:280px}
+        .lp-preview-sb{background:#060d1a;border-right:1px solid rgba(255,255,255,.06);padding:12px 0}
+        .lp-preview-sb-logo{display:flex;align-items:center;gap:7px;padding:4px 12px 12px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:8px}
+        .lp-preview-sb-name{font-size:12px;font-weight:800;color:#fff}
+        .lp-preview-nav{display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:10px;color:rgba(255,255,255,.35)}
+        .lp-preview-nav.on{background:rgba(16,185,129,.1);color:#10b981}
+        .lp-preview-main{padding:16px}
+        .lp-preview-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+        .lp-preview-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px}
+        .lp-preview-kpi-n{font-size:20px;font-weight:900;color:#fff}
+        .lp-preview-kpi-l{font-size:8px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+        .lp-preview-row{display:flex;gap:8px}
+        .lp-preview-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;flex:1}
+        .lp-preview-card-title{font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:7px}
+        .lp-preview-alert{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+        .lp-preview-alert:last-child{border-bottom:none}
+        .lp-how{padding:60px 6%;text-align:center;background:linear-gradient(180deg,transparent,rgba(167,139,250,.03),transparent)}
+        .lp-how-inner{max-width:900px;margin:0 auto}
+        .lp-how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px;position:relative}
+        .lp-how-steps::before{content:'';position:absolute;top:28px;left:17%;right:17%;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,.3),rgba(167,139,250,.3),transparent)}
+        .lp-how-step{display:flex;flex-direction:column;align-items:center;gap:14px}
+        .lp-how-num{width:56px;height:56px;border-radius:50%;background:#0a1628;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;z-index:1}
+        .lp-how-title{font-size:15px;font-weight:700;color:#fff}
+        .lp-how-desc{font-size:13px;color:rgba(255,255,255,.4);line-height:1.6;text-align:center}
+        .lp-pricing{padding:60px 6%;max-width:1000px;margin:0 auto;width:100%;text-align:center}
+        .lp-pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+        .lp-price{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:28px;text-align:left;position:relative;transition:.2s}
+        .lp-price:hover{transform:translateY(-3px)}
+        .lp-price.pop{border-color:rgba(16,185,129,.4);background:linear-gradient(180deg,rgba(16,185,129,.05),rgba(255,255,255,.02))}
+        .lp-price-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:10px;font-weight:700;padding:3px 14px;border-radius:20px;white-space:nowrap}
+        .lp-price-name{font-size:12px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+        .lp-price-amount{font-size:44px;font-weight:900;color:#fff;line-height:1;margin-bottom:4px}
+        .lp-price-amount span{font-size:18px;color:rgba(255,255,255,.4)}
+        .lp-price-period{font-size:11px;color:rgba(255,255,255,.3);margin-bottom:20px}
+        .lp-price-feats{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+        .lp-price-feat{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.6)}
+        .lp-price-check{color:#10b981;font-size:13px;flex-shrink:0}
+        .lp-price-btn{width:100%;padding:11px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+        .lp-price-btn-out{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6)}
+        .lp-price-btn-out:hover{border-color:rgba(255,255,255,.3);color:#fff}
+        .lp-price-btn-green{background:linear-gradient(135deg,#10b981,#059669);border:none;color:#fff}
+        .lp-price-btn-green:hover{box-shadow:0 4px 16px rgba(16,185,129,.35)}
+        .lp-test{padding:60px 6%;max-width:1000px;margin:0 auto;width:100%;text-align:center}
+        .lp-test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+        .lp-test-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:24px;text-align:left}
+        .lp-test-stars{color:#f59e0b;font-size:13px;margin-bottom:10px;letter-spacing:2px}
+        .lp-test-quote{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:16px;font-style:italic}
+        .lp-test-author{display:flex;align-items:center;gap:10px}
+        .lp-test-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+        .lp-test-name{font-size:12px;font-weight:700;color:#fff}
+        .lp-test-role{font-size:11px;color:rgba(255,255,255,.3)}
+        .lp-faq{padding:60px 6%;max-width:700px;margin:0 auto;width:100%;text-align:center}
+        .lp-faq-list{margin-top:40px;text-align:left;display:flex;flex-direction:column;gap:4px}
+        .lp-faq-item{border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden}
+        .lp-faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;background:rgba(255,255,255,.02);list-style:none}
+        .lp-faq-a{padding:0 20px 16px;font-size:13px;color:rgba(255,255,255,.5);line-height:1.7}
+        .lp-sec-label{font-size:11px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+        .lp-sec-title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-1px;margin-bottom:14px;color:#fff}
+        .lp-sec-sub{font-size:15px;color:rgba(255,255,255,.4);max-width:500px;margin:0 auto;line-height:1.7}
+        .lp-nav.sticky{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(6,13,26,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08)}
+        .lp-logos{padding:20px 6% 40px;text-align:center}
+        .lp-logos-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px}
+        .lp-logos-row{display:flex;gap:36px;justify-content:center;flex-wrap:wrap;opacity:.3}
+        .lp-logos-row span{font-size:15px;font-weight:700;color:#fff}
         @media(max-width:768px){
-          .lp-features{grid-template-columns:1fr}
+          .lp-features,.lp-pricing-grid,.lp-test-grid{grid-template-columns:1fr}
           .lp-stats{gap:20px}
           .lp-nav{padding:10px 4%;height:56px}
           .lp-nav-brand{font-size:15px}
@@ -1191,20 +1259,24 @@ export default function App() {
           .lp-btn-out{padding:6px 12px;font-size:12px}
           .lp-btn-pri{padding:6px 12px;font-size:12px}
           .lp-h1{font-size:30px;letter-spacing:-1px}
-          .lp-hero{padding:40px 5% 32px}
+          .lp-hero{padding:60px 5% 32px}
           .lp-sub{font-size:13px}
           .lp-cta-pri,.lp-cta-sec{padding:12px 20px;font-size:13px;width:100%;text-align:center}
           .lp-ctas{flex-direction:column;align-items:center;gap:10px}
           .lp-stat-n{font-size:26px}
           .lp-stat-l{font-size:9px}
           .lp-features{padding:32px 4%}
-          .lp-features{grid-template-columns:1fr}
           .lp-feat{padding:18px}
+          .lp-preview-body{grid-template-columns:1fr}
+          .lp-preview-sb{display:none}
+          .lp-preview-kpis{grid-template-columns:1fr 1fr}
+          .lp-how-steps{grid-template-columns:1fr;gap:24px}
+          .lp-how-steps::before{display:none}
+          .lp-logos-row{gap:20px}
         }
       `}</style></style>
       <div className="lp">
-        {/* NAV */}
-        <nav className="lp-nav">
+        <nav className="lp-nav sticky">
           <div className="lp-nav-logo">
             <svg viewBox="0 0 36 36" fill="none" width="32" height="32">
               <defs><linearGradient id="lng1" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#a78bfa"/><stop offset="1" stopColor="#34d399"/></linearGradient></defs>
@@ -1220,13 +1292,12 @@ export default function App() {
           </div>
         </nav>
 
-        {/* HERO */}
-        <div className="lp-hero">
+        <div className="lp-hero" style={{paddingTop:110}}>
           <div className="lp-badge"><div className="lp-badge-dot"/>Real-time SaaS security scanning</div>
           <h1 className="lp-h1">Know every app.<br/><span className="gr">Trust every connection.</span></h1>
           <p className="lp-sub">ScopeGuard automatically discovers and monitors every third-party app connected to your company — and lets you revoke dangerous access in one click.</p>
           <div className="lp-ctas">
-            <button className="lp-cta-pri" onClick={()=>{setShowLanding(false);setAuthMode("register")}}>Start securing for free →</button>
+            <button className="lp-cta-pri" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Start securing for free →</button>
             <button className="lp-cta-sec" onClick={enterDemo}>🚀 Try live demo</button>
           </div>
           <div className="lp-stats">
@@ -1237,34 +1308,169 @@ export default function App() {
           </div>
         </div>
 
-        {/* FEATURES */}
-        <div className="lp-features">
-          {[
-            ["🔍","Auto Discovery","Connect Slack, GitHub, or Google Workspace and instantly discover every third-party app — no manual entry."],
-            ["⚠️","Real-time Risk Scoring","Every app gets a 0–100 risk score. Critical threats surface immediately with actionable alerts."],
-            ["⚡","One-click Revocation","Revoke dangerous app access instantly. Every action is logged with a full audit trail."],
-            ["📋","SOC 2 & GDPR Ready","Automatic mapping to compliance controls. Export audit reports for stakeholders in one click."],
-            ["🔔","Instant Alerts","Get notified via email or Slack the moment a critical or unverified app is detected."],
-            ["📊","Risk Timeline","Track your security score over time and show measurable improvement to leadership."],
-          ].map(([ico,title,desc])=>(
-            <div key={title} className="lp-feat">
-              <div className="lp-feat-ico">{ico}</div>
-              <div className="lp-feat-title">{title}</div>
-              <div className="lp-feat-desc">{desc}</div>
+        <div className="lp-preview">
+          <div className="lp-preview-win">
+            <div className="lp-preview-bar">
+              <div className="lp-preview-dot" style={{background:"#ff5f57"}}/>
+              <div className="lp-preview-dot" style={{background:"#ffbd2e"}}/>
+              <div className="lp-preview-dot" style={{background:"#28c840"}}/>
+              <div className="lp-preview-url">app.scopeguard.io/dashboard</div>
             </div>
-          ))}
+            <div className="lp-preview-body">
+              <div className="lp-preview-sb">
+                <div className="lp-preview-sb-logo">
+                  <div style={{width:20,height:20,background:"linear-gradient(135deg,#a78bfa,#10b981)",borderRadius:5,flexShrink:0}}/>
+                  <span className="lp-preview-sb-name">ScopeGuard</span>
+                </div>
+                {[["🏠","Dashboard",true],["📋","App Inventory",false],["⚠️","Alerts",false],["📊","SOC 2",false],["🌍","GDPR",false]].map(([ico,lbl,on])=>(
+                  <div key={lbl} className={`lp-preview-nav ${on?"on":""}`}><span>{ico}</span> {lbl}</div>
+                ))}
+              </div>
+              <div className="lp-preview-main">
+                <div className="lp-preview-kpis">
+                  <div className="lp-preview-kpi"><div className="lp-preview-kpi-n" style={{color:"#10b981"}}>73</div><div className="lp-preview-kpi-l">Security Score</div></div>
+                  <div className="lp-preview-kpi"><div className="lp-preview-kpi-n">24</div><div className="lp-preview-kpi-l">Connected Apps</div></div>
+                  <div className="lp-preview-kpi"><div className="lp-preview-kpi-n" style={{color:"#ef4444"}}>3</div><div className="lp-preview-kpi-l">Critical Risks</div></div>
+                  <div className="lp-preview-kpi"><div className="lp-preview-kpi-n" style={{color:"#f59e0b"}}>7</div><div className="lp-preview-kpi-l">Stale Tokens</div></div>
+                </div>
+                <div className="lp-preview-row">
+                  <div className="lp-preview-card" style={{flex:1.2}}>
+                    <div className="lp-preview-card-title">Critical Alerts</div>
+                    {[["#ef4444","Unverified app reading all Slack channels"],["#f59e0b","GitHub admin token — 94 days inactive"],["#ef4444","App with full Gmail inbox access"]].map(([c,t])=>(
+                      <div key={t} className="lp-preview-alert">
+                        <div style={{width:6,height:6,borderRadius:"50%",background:c,flexShrink:0}}/>
+                        <span style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>{t}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="lp-preview-card" style={{flex:.8}}>
+                    <div className="lp-preview-card-title">Access by Type</div>
+                    {[["Email",72,"#ef4444"],["Repos",55,"#f59e0b"],["Admin",38,"#f59e0b"],["Files",20,"#10b981"]].map(([l,p,c])=>(
+                      <div key={l} style={{display:"flex",alignItems:"center",gap:6,marginBottom:5}}>
+                        <span style={{fontSize:8,color:"rgba(255,255,255,.35)",width:34,flexShrink:0}}>{l}</span>
+                        <div style={{flex:1,height:3,background:"rgba(255,255,255,.08)",borderRadius:2}}><div style={{width:`${p}%`,height:"100%",background:c,borderRadius:2}}/></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* FOOTER */}
+        <div className="lp-logos">
+          <div className="lp-logos-label">Integrates with the tools your team already uses</div>
+          <div className="lp-logos-row">
+            {["Slack","GitHub","Google Workspace","Salesforce","Notion","Zapier","Jira","HubSpot"].map(l=><span key={l}>{l}</span>)}
+          </div>
+        </div>
+
+        <div className="lp-how">
+          <div className="lp-how-inner">
+            <div className="lp-sec-label">How it works</div>
+            <div className="lp-sec-title">Up and running in 90 seconds</div>
+            <div className="lp-how-steps">
+              {[["🔗","1. Connect","One-click OAuth to Slack, GitHub, Google Workspace"],["🔍","2. Auto-scan","Discovers every connected app and scores its risk level"],["⚡","3. Take action","Revoke dangerous access instantly with full audit trail"]].map(([ico,t,d])=>(
+                <div key={t} className="lp-how-step">
+                  <div className="lp-how-num">{ico}</div>
+                  <div className="lp-how-title">{t}</div>
+                  <div className="lp-how-desc">{d}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div style={{padding:"0 6% 60px",maxWidth:1100,margin:"0 auto",width:"100%",textAlign:"center"}}>
+          <div className="lp-sec-label">Features</div>
+          <div className="lp-sec-title">Everything your security team needs</div>
+          <div className="lp-features" style={{marginTop:40,padding:0}}>
+            {[["🔍","Auto Discovery","Connect once and discover every OAuth app, API key, and integration automatically."],["⚠️","Risk Scoring","0–100 risk score per app based on permissions, inactivity, and publisher verification."],["⚡","One-click Revoke","Revoke access instantly. Full audit log for every action."],["📋","SOC 2 & GDPR","Auto-mapping to compliance controls. Audit-ready PDF reports in one click."],["🔔","Instant Alerts","Email and Slack notifications when critical apps are detected."],["📊","Risk Timeline","Track security score improvement over time."]].map(([ico,t,d])=>(
+              <div key={t} className="lp-feat"><div className="lp-feat-ico">{ico}</div><div className="lp-feat-title">{t}</div><div className="lp-feat-desc">{d}</div></div>
+            ))}
+          </div>
+        </div>
+
+        <div className="lp-test">
+          <div className="lp-sec-label">Customers</div>
+          <div className="lp-sec-title">Trusted by security teams</div>
+          <div className="lp-test-grid">
+            {[["S","#6366f1","Sarah K.","CISO, Series B SaaS","We found 47 apps connected to our Slack we had no idea about. Three had admin access. ScopeGuard paid for itself in the first hour."],["M","#0ea5e9","Michael T.","VP Engineering, FinTech","Our SOC 2 auditor was impressed. First time we showed a complete inventory of every third-party integration with risk scores."],["A","#f59e0b","Aisha R.","IT Manager, 200-person startup","Setup took 2 minutes. Within 5 minutes we had a full picture of our SaaS security posture."]].map(([av,ac,name,role,quote])=>(
+              <div key={name} className="lp-test-card">
+                <div className="lp-test-stars">★★★★★</div>
+                <div className="lp-test-quote">"{quote}"</div>
+                <div className="lp-test-author">
+                  <div className="lp-test-av" style={{background:`linear-gradient(135deg,${ac},${ac}88)`}}>{av}</div>
+                  <div><div className="lp-test-name">{name}</div><div className="lp-test-role">{role}</div></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="lp-pricing">
+          <div className="lp-sec-label">Pricing</div>
+          <div className="lp-sec-title">Simple, transparent pricing</div>
+          <div className="lp-sec-sub">No hidden fees. Cancel anytime. Start free.</div>
+          <div className="lp-pricing-grid">
+            <div className="lp-price">
+              <div className="lp-price-name">Starter</div>
+              <div className="lp-price-amount"><span>$</span>0</div>
+              <div className="lp-price-period">Free forever</div>
+              <div className="lp-price-feats">{["Up to 25 apps","2 platform integrations","Basic risk scoring","Email alerts","1 team member"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
+              <button className="lp-price-btn lp-price-btn-out" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Get started free</button>
+            </div>
+            <div className="lp-price pop">
+              <div className="lp-price-badge">MOST POPULAR</div>
+              <div className="lp-price-name">Pro</div>
+              <div className="lp-price-amount"><span>$</span>149</div>
+              <div className="lp-price-period">per month, billed annually</div>
+              <div className="lp-price-feats">{["Unlimited apps","All platforms","SOC 2 & GDPR","Slack & email alerts","PDF reports","Risk timeline","10 team members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
+              <button className="lp-price-btn lp-price-btn-green" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Start Pro trial →</button>
+            </div>
+            <div className="lp-price">
+              <div className="lp-price-name">Enterprise</div>
+              <div className="lp-price-amount" style={{fontSize:32}}>Custom</div>
+              <div className="lp-price-period">Volume pricing available</div>
+              <div className="lp-price-feats">{["Everything in Pro","SSO / SAML","Custom integrations","Dedicated CSM","SLA guarantee","Unlimited members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
+              <button className="lp-price-btn lp-price-btn-out">Contact sales</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="lp-faq">
+          <div className="lp-sec-label">FAQ</div>
+          <div className="lp-sec-title">Common questions</div>
+          <div className="lp-faq-list">
+            {[["Does it work with Google Workspace?","Google Workspace is coming soon. Currently ScopeGuard supports GitHub and Slack with full scanning."],["How long does setup take?","Under 2 minutes. Connect via OAuth, click Scan, and you have a full inventory immediately."],["Is my data secure?","ScopeGuard only reads metadata about app permissions — never your emails, messages, or files. All data is encrypted at rest."],["What happens when I revoke?","The action is logged with timestamp and user. The token revocation happens in the source platform. ScopeGuard provides the audit trail."],["Can I export for auditors?","Yes — one-click PDF with security score, app inventory, risk recommendations, and SOC 2 / GDPR compliance mapping."]].map(([q,a])=>(
+              <details key={q} className="lp-faq-item">
+                <summary className="lp-faq-q">{q} <span>+</span></summary>
+                <div className="lp-faq-a">{a}</div>
+              </details>
+            ))}
+          </div>
+        </div>
+
+        <div style={{padding:"80px 6%",textAlign:"center",position:"relative"}}>
+          <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:600,height:300,background:"radial-gradient(ellipse,rgba(16,185,129,.07),transparent 70%)",pointerEvents:"none"}}/>
+          <h2 className="lp-sec-title" style={{fontSize:"clamp(28px,5vw,48px)",marginBottom:16}}>Start securing your SaaS stack today</h2>
+          <p style={{fontSize:15,color:"rgba(255,255,255,.4)",marginBottom:36,maxWidth:460,margin:"0 auto 36px"}}>Join hundreds of security teams who trust ScopeGuard to protect their SaaS connections.</p>
+          <div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap"}}>
+            <button className="lp-cta-pri" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Get started free — no credit card →</button>
+            <button className="lp-cta-sec" onClick={enterDemo}>🚀 Try live demo</button>
+          </div>
+        </div>
+
         <footer className="lp-footer">
-          <span className="lp-footer-brand">🛡️ ScopeGuard — SSPM Platform</span>
-          <span className="lp-footer-copy">© 2026 ScopeGuard. All rights reserved.</span>
+          <span style={{fontSize:14,fontWeight:700,color:"rgba(255,255,255,.4)"}}>🛡️ ScopeGuard</span>
+          <div className="lp-footer-links"><a href="#">Features</a><a href="#">Pricing</a><a href="#">Contact</a></div>
+          <span style={{fontSize:11,color:"rgba(255,255,255,.2)"}}>© 2026 ScopeGuard. All rights reserved.</span>
         </footer>
       </div></>
     );
   }
 
-  // 2. Auth form (no session, not landing, not demo)
+  // 2. Auth form (no session, not landing, not demo) (no session, not landing, not demo)
   if (!session && !isDemo) {
     const isReg = authMode==="register";
     return (
