@@ -1137,7 +1137,7 @@ export default function App() {
   );
 
   // ── AUTH ──
-  if (!session) {
+  if (!session || showLanding) {
     // ── LANDING PAGE ──
     if (showLanding) return (
       <><style>{CSS}<style>{`
@@ -1210,8 +1210,8 @@ export default function App() {
             <span className="lp-nav-brand">ScopeGuard</span>
           </div>
           <div className="lp-nav-btns">
-            <button className="lp-btn-out" onClick={()=>{setShowLanding(false);setAuthMode("login")}}>Sign In</button>
-            <button className="lp-btn-pri" onClick={()=>{setShowLanding(false);setAuthMode("register")}}>Get Started Free →</button>
+            <button className="lp-btn-out" onClick={()=>setShowLanding(false)}>{session ? "Dashboard →" : "Sign In"}</button>
+            <button className="lp-btn-pri" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Get Started Free →</button>
           </div>
         </nav>
 
@@ -2189,7 +2189,7 @@ export default function App() {
           {isDemo && (
             <div style={{position:"absolute",top:0,left:0,right:0,background:"linear-gradient(90deg,#a78bfa,#10b981)",height:3,zIndex:10}}/>
           )}
-          <div className="sb-logo" onClick={()=>{doSignOut();setShowLanding(true)}} style={{cursor:"pointer"}} title="Back to home">
+          <div className="sb-logo" onClick={()=>setShowLanding(true)} style={{cursor:"pointer"}} title="Back to home">
             <svg viewBox="0 0 38 38" fill="none" width="38" height="38">
               <defs>
                 <linearGradient id="lc1" x1="0" y1="0" x2="1" y2="1">
@@ -2210,7 +2210,7 @@ export default function App() {
               <circle cx="25" cy="20" r="1.5" fill="#34d399"/>
             </svg>
           </div>
-          <div style={{cursor:"pointer"}} onClick={()=>{doSignOut();setShowLanding(true)}}>
+          <div style={{cursor:"pointer"}} onClick={()=>setShowLanding(true)}>
             <div className="sb-bname">ScopeGuard</div>
             <div className="sb-tagline">Know every app. Trust every connection.</div>
           </div>
@@ -2289,6 +2289,9 @@ export default function App() {
             </div>
           </div>
           <div className="tb-r">
+            <button className="btn-sec" onClick={()=>setShowLanding(true)} style={{fontSize:12,display:"flex",alignItems:"center",gap:5}}>
+              🏠<span className="hide-mobile"> Home</span>
+            </button>
             <button className="btn-sec hide-mobile" onClick={toggleDark} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
               {darkMode ? "☀️ Light" : "🌙 Dark"}
             </button>
