@@ -1094,7 +1094,9 @@ export default function App() {
     // ── LANDING PAGE ──
     if (showLanding) return (
       <><style>{CSS}<style>{`
-        .lp{min-height:100vh;background:linear-gradient(135deg,#060d1a 0%,#0a1628 50%,#061a10 100%);display:flex;flex-direction:column;font-family:'Inter',-apple-system,sans-serif;color:#fff;overflow-x:hidden}
+        .lp{min-height:100vh;background:linear-gradient(135deg,#060d1a 0%,#0a1628 50%,#061a10 100%);display:flex;flex-direction:column;font-family:'Inter',-apple-system,sans-serif;color:#fff;overflow-x:hidden;overflow-y:auto}
+        html body{overflow:auto !important;height:auto !important}
+        html{overflow:auto !important;height:auto !important}
         .lp-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 6%;border-bottom:1px solid rgba(255,255,255,.06)}
         .lp-nav-logo{display:flex;align-items:center;gap:10px}
         .lp-nav-brand{font-size:20px;font-weight:900;letter-spacing:-.5px;color:#fff}
