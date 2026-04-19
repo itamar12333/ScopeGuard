@@ -591,96 +591,74 @@ tbody tr.rev td{opacity:.35}
 
 /* MOBILE RESPONSIVE */
 .hide-mobile{display:inline}
-@media(max-width:768px){.hide-mobile{display:none}}
-  /* Shell layout — sidebar on top as bottom nav */
-  .shell{flex-direction:column;width:100vw;height:100vh}
-
-  /* Sidebar becomes bottom navigation bar */
-  .sidebar{
-    width:100%;min-width:unset;height:auto;
-    flex-direction:column;
-    border-right:none;border-top:1px solid rgba(255,255,255,.08);
-    order:2;flex-shrink:0;
-    background:linear-gradient(180deg,#0a1628,#060d1a);
-  }
+@media(max-width:768px){
+  .hide-mobile{display:none}
+  .shell{flex-direction:column;width:100vw;height:100dvh;height:100vh}
+  .content{flex:1;min-height:0;order:1;display:flex;flex-direction:column;overflow:hidden}
+  .topbar{padding:0 12px;height:50px;min-height:50px;flex-shrink:0}
+  .tb-title{font-size:14px;letter-spacing:-.3px}
+  .tb-sub{font-size:9px;gap:3px;flex-wrap:nowrap;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:180px}
+  .tb-r{gap:4px;flex-shrink:0}
+  .btn-sec{padding:5px 8px;font-size:11px}
+  .btn-pri{padding:5px 12px;font-size:11px}
+  .scroll-area{padding:10px 10px 70px;gap:10px}
+  .sidebar{order:2;width:100%;height:54px;min-height:54px;flex-shrink:0;flex-direction:row;background:#060d1a;border-top:1px solid rgba(255,255,255,.1);border-right:none;overflow:hidden}
   .sb-brand{display:none}
-  .sb-inner{
-    flex-direction:row;overflow-x:auto;overflow-y:hidden;
-    flex:0;padding:4px 8px;
-    scrollbar-width:none;
-  }
-  .sb-inner::-webkit-scrollbar{display:none}
-  .sb-nav{
-    padding:4px 0;display:flex;flex-direction:row;
-    overflow-x:auto;white-space:nowrap;gap:2px;
-    scrollbar-width:none;flex:1;
-  }
-  .sb-nav::-webkit-scrollbar{display:none}
-  .sb-sec{display:none}
-  .sb-link{
-    padding:6px 12px;border-radius:8px;
-    font-size:11px;font-weight:600;
-    white-space:nowrap;margin-bottom:0;
-    flex-direction:column;gap:2px;align-items:center;
-    min-width:60px;text-align:center;
-  }
-  .sb-icon{display:none}
-  .sb-badge{font-size:8px;padding:1px 4px}
-  .sb-footer{
-    border-top:1px solid rgba(255,255,255,.06);
-    padding:6px 12px;display:flex;align-items:center;
-    justify-content:space-between;
-  }
+  .sb-footer{display:none}
   .sb-lang{display:none}
   .sb-dm-row{display:none}
-  .sb-uname{max-width:120px}
-
-  /* Content area */
-  .content{flex:1;min-height:0;order:1;height:auto}
-  .topbar{padding:0 14px;height:52px;flex-shrink:0}
-  .tb-title{font-size:15px}
-  .tb-r{gap:6px}
-  .btn-sec{padding:6px 10px;font-size:11px}
-  .btn-pri{padding:6px 14px;font-size:11px}
-  .scroll-area{padding:12px 12px 16px;gap:12px}
-
-  /* Demo topbar info — compact */
-  .tb-sub{font-size:10px}
-
-  /* KPI cards — 2 columns */
-  .kpi-row{grid-template-columns:1fr 1fr;gap:10px}
-  .kpi{padding:14px}
-  .kpi-val{font-size:26px}
-  .kpi-lbl{font-size:9px}
-  .ring{width:44px;height:44px}
-  .ring svg{width:44px;height:44px}
-
-  /* Mid row — single column */
-  .mid-row{grid-template-columns:1fr;gap:12px}
-
-  /* Table — hide less important cols */
-  .tbar{flex-direction:column;align-items:flex-start;gap:8px}
-  .filters{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
-  .srch{width:130px;font-size:11px}
-  table{font-size:10px}
-  thead th,tbody td{padding:8px 8px}
-  /* Hide compliance column on mobile */
-  thead th:nth-child(6),tbody td:nth-child(6){display:none}
-
-  /* Other pages */
-  .profile-grid{grid-template-columns:1fr}
-  .guide-grid{grid-template-columns:1fr}
-  .int-grid{grid-template-columns:1fr}
-  .comp-2col{grid-template-columns:1fr}
-  .add-app-grid{grid-template-columns:1fr}
-  .form-grid{grid-template-columns:1fr}
-
-  /* Modals full-width */
-  .modal-box{width:95%;padding:20px}
-  .onboard-card{padding:24px;width:95%}
-
-  /* Detail panel full screen on mobile */
-  .dp{width:100%;border-left:none;border-top:1px solid var(--border)}
+  .sb-inner{flex:1;display:flex;flex-direction:row;align-items:center;overflow:hidden;height:100%}
+  .sb-nav{display:flex;flex-direction:row;align-items:center;padding:4px 6px;gap:2px;width:100%;justify-content:space-around;overflow-x:auto;scrollbar-width:none}
+  .sb-nav::-webkit-scrollbar{display:none}
+  .sb-sec{display:none}
+  .sb-link{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 6px;border-radius:8px;margin-bottom:0;font-size:9px;font-weight:600;color:rgba(255,255,255,.4);min-width:44px;gap:2px;white-space:nowrap;border:1px solid transparent}
+  .sb-link.active{background:rgba(16,185,129,.12);color:#10b981;border-color:rgba(16,185,129,.2)}
+  .sb-icon{width:15px;height:15px;display:block !important;opacity:.5;flex-shrink:0}
+  .sb-link.active .sb-icon{opacity:1}
+  .sb-badge{font-size:7px;padding:1px 3px}
+  .kpi-row{grid-template-columns:1fr 1fr;gap:8px}
+  .kpi{padding:12px 10px;border-radius:12px}
+  .kpi-lbl{font-size:8px;margin-bottom:6px}
+  .kpi-val{font-size:22px}
+  .kpi-sub{font-size:9px;margin-top:3px}
+  .ring-wrap{gap:8px}
+  .ring{width:40px;height:40px}
+  .ring svg{width:40px;height:40px}
+  .ring-grade{font-size:11px}
+  .dbar-lbl{font-size:9px;min-width:34px}
+  .dbar-n{font-size:9px}
+  .mid-row{grid-template-columns:1fr;gap:10px}
+  .card{padding:14px}
+  .card-title{font-size:12px}
+  .pbar-lbl{font-size:9px;min-width:90px}
+  .al-ttl{font-size:10px}
+  .al-meta{font-size:9px}
+  .tcard{border-radius:12px}
+  .tbar{flex-direction:column;align-items:stretch;gap:8px;padding:10px 12px}
+  .tbar-title{font-size:12px}
+  .filters{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;scrollbar-width:none;padding-bottom:2px}
+  .filters::-webkit-scrollbar{display:none}
+  .srch{width:110px;font-size:10px;padding:5px 8px}
+  .chip{font-size:9px;padding:3px 7px;white-space:nowrap}
+  table{font-size:9px}
+  thead th{padding:6px 5px;font-size:8px}
+  tbody td{padding:8px 5px}
+  .app-nm{font-size:10px}
+  .app-pl{font-size:8px}
+  .btn-rev{font-size:9px;padding:3px 7px}
+  .btn-rvw{font-size:9px;padding:3px 7px}
+  thead th:nth-child(4),tbody td:nth-child(4),thead th:nth-child(6),tbody td:nth-child(6){display:none}
+  .tfoot{font-size:9px;padding:7px 12px}
+  .profile-grid,.guide-grid,.int-grid,.comp-2col,.add-app-grid,.form-grid{grid-template-columns:1fr}
+  .comp-hero{grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+  .comp-n{font-size:26px}
+  .modal-box{width:92%;padding:20px;border-radius:16px}
+  .onboard-card{padding:22px;width:94%;border-radius:18px}
+  .onboard-title{font-size:19px}
+  .dp{width:100%;border-left:none}
+  .bulk-bar{padding:8px 12px;gap:8px}
+  .timeline-card{padding:14px}
+  .auth-card{padding:28px 20px;border-radius:18px}
 }
 
 /* RTL FULL SUPPORT */
@@ -2199,7 +2177,7 @@ export default function App() {
             <div className="tb-sub">
               <span className="tb-pulse"/>
               {isDemo
-                ? <><span style={{background:"rgba(167,139,250,.15)",border:"1px solid rgba(167,139,250,.3)",borderRadius:6,padding:"1px 8px",color:"#a78bfa",fontWeight:700,fontSize:10}}>DEMO</span> Data is simulated — <span style={{color:"#10b981",cursor:"pointer",fontWeight:700}} onClick={doSignOut}>Create free account →</span></>
+                ? <><span style={{background:"rgba(167,139,250,.15)",border:"1px solid rgba(167,139,250,.3)",borderRadius:6,padding:"1px 6px",color:"#a78bfa",fontWeight:700,fontSize:9,flexShrink:0}}>DEMO</span><span className="hide-mobile" style={{color:"rgba(255,255,255,.4)"}}> · Data is simulated — </span><span style={{color:"#10b981",cursor:"pointer",fontWeight:700,fontSize:10,flexShrink:0}} onClick={doSignOut}>Create account →</span></>
                 : `${t.lastScan}: ${scanMin} ${t.minsAgo} · ${apps.length} ${t.appsMonitored}`
               }
             </div>
