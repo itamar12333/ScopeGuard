@@ -6,7 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -2190,7 +2189,7 @@ export default function App() {
           {isDemo && (
             <div style={{position:"absolute",top:0,left:0,right:0,background:"linear-gradient(90deg,#a78bfa,#10b981)",height:3,zIndex:10}}/>
           )}
-          <div className="sb-logo">
+          <div className="sb-logo" onClick={()=>{doSignOut();setShowLanding(true)}} style={{cursor:"pointer"}} title="Back to home">
             <svg viewBox="0 0 38 38" fill="none" width="38" height="38">
               <defs>
                 <linearGradient id="lc1" x1="0" y1="0" x2="1" y2="1">
@@ -2211,7 +2210,7 @@ export default function App() {
               <circle cx="25" cy="20" r="1.5" fill="#34d399"/>
             </svg>
           </div>
-          <div>
+          <div style={{cursor:"pointer"}} onClick={()=>{doSignOut();setShowLanding(true)}}>
             <div className="sb-bname">ScopeGuard</div>
             <div className="sb-tagline">Know every app. Trust every connection.</div>
           </div>
