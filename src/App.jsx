@@ -93,7 +93,7 @@ html.dark{
 }
 
 /* LAYOUT — TRUE FULL SCREEN */
-.shell{display:flex;width:100%;height:100%;overflow:hidden;background:var(--bg)}
+.shell{display:flex;width:100vw;height:100vh;overflow:hidden;background:var(--bg);position:fixed;top:0;left:0}
 .sidebar{width:230px;min-width:230px;max-width:230px;height:100%;background:linear-gradient(180deg,#060d1a 0%,#0a1628 100%);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;border-right:1px solid rgba(255,255,255,.05)}
 .sb-inner{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;min-height:0}
 .sb-inner::-webkit-scrollbar{width:3px}
@@ -1097,6 +1097,7 @@ export default function App() {
         .lp{min-height:100vh;background:linear-gradient(135deg,#060d1a 0%,#0a1628 50%,#061a10 100%);display:flex;flex-direction:column;font-family:'Inter',-apple-system,sans-serif;color:#fff;overflow-x:hidden;overflow-y:auto}
         html body{overflow:auto !important;height:auto !important}
         html{overflow:auto !important;height:auto !important}
+        #root{height:auto !important;overflow:visible !important}
         .lp-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 6%;border-bottom:1px solid rgba(255,255,255,.06)}
         .lp-nav-logo{display:flex;align-items:center;gap:10px}
         .lp-nav-brand{font-size:20px;font-weight:900;letter-spacing:-.5px;color:#fff}
