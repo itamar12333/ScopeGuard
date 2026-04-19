@@ -937,8 +937,9 @@ export default function App() {
   };
 
   const enterDemo = () => {
-    setShowLanding(false);
+    // Set all demo state at once
     setIsDemo(true);
+    setShowLanding(false);
     setSession({ user: { id:"demo", email:"demo@scopeguard.io" } });
     setProfile(DEMO_PROFILE);
     setOrg(DEMO_ORG);
@@ -1140,9 +1141,8 @@ export default function App() {
   );
 
   // ── AUTH ──
-  if ((!session || showLanding) && !isDemo) {
-    // ── LANDING PAGE ──
-    if (showLanding) return (
+  if (showLanding && !isDemo) {
+    return (
       <><style>{CSS}<style>{`
         .lp{min-height:100vh;background:linear-gradient(135deg,#060d1a 0%,#0a1628 50%,#061a10 100%);display:flex;flex-direction:column;font-family:'Inter',-apple-system,sans-serif;color:#fff;overflow-x:hidden;overflow-y:auto}
         html body{overflow:auto !important;height:auto !important}
@@ -1260,6 +1260,8 @@ export default function App() {
         </footer>
       </div></>
     );
+
+    if (session) { setShowLanding(false); return null; }
 
     const isReg = authMode==="register";
     return (
