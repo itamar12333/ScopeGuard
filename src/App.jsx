@@ -6,6 +6,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -1107,8 +1108,6 @@ export default function App() {
   const filled = (sec/100)*perim;
 
   const filtApps = apps.filter(a => {
-    const lq=q.toLowerCase();
-    if (lq && !a.name?.toLowerCase().includes(lq) && !(a.platform?.name||"").toLowerCase().includes(lq)) return false;
     if (filter==="critical" && a.severity!=="critical") return false;
     if (filter==="high" && !["critical","high"].includes(a.severity)) return false;
     if (fsStale && !a.is_stale) return false;
@@ -1403,14 +1402,17 @@ export default function App() {
 
   // ── TABLE ──
   const AppTable = () => {
-    const [localQ, setLocalQ] = useState(q);
-    const inputRef = useRef(null);
-
-    // Sync to parent q with debounce
-    useEffect(() => {
-      const timer = setTimeout(() => setQ(localQ), 150);
-      return () => clearTimeout(timer);
-    }, [localQ]);
+    const [localQ, setLocalQ] = useState("");
+    const filtApps = apps.filter(a => {
+      const lq = localQ.toLowerCase();
+      if (lq && !a.name?.toLowerCase().includes(lq) && !(a.platform?.name||"").toLowerCase().includes(lq)) return false;
+      if (filter==="critical" && a.severity!=="critical") return false;
+      if (filter==="high" && !["critical","high"].includes(a.severity)) return false;
+      if (fsStale && !a.is_stale) return false;
+      if (fsSOC && !a.compliance?.some(c=>c.framework?.short_code==="soc2")) return false;
+      if (fsGDPR && !a.compliance?.some(c=>c.framework?.short_code==="gdpr")) return false;
+      return true;
+    }).sort((a,b) => { const av=a[sortCol]??0, bv=b[sortCol]??0; return (av>bv?1:av<bv?-1:0)*sortDir; });
 
     return (
     <div className="tcard">
@@ -1418,7 +1420,6 @@ export default function App() {
         <span className="tbar-title">{t.inventory||"App Inventory"}</span>
         <div className="filters">
           <input
-            ref={inputRef}
             className="srch"
             placeholder={t.search}
             value={localQ}
