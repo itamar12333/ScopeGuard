@@ -937,6 +937,7 @@ export default function App() {
   };
 
   const enterDemo = () => {
+    setShowLanding(false);
     setIsDemo(true);
     setSession({ user: { id:"demo", email:"demo@scopeguard.io" } });
     setProfile(DEMO_PROFILE);
@@ -946,7 +947,7 @@ export default function App() {
     setRevs(DEMO_REVS);
     setPlatforms(DEMO_PLATFORMS);
     setAppLoading(false);
-    setShowLanding(false);
+    setPage("dashboard");
   };
 
   const doSignOut = async () => {
@@ -1139,7 +1140,7 @@ export default function App() {
   );
 
   // ── AUTH ──
-  if (!session || showLanding) {
+  if ((!session || showLanding) && !isDemo) {
     // ── LANDING PAGE ──
     if (showLanding) return (
       <><style>{CSS}<style>{`
