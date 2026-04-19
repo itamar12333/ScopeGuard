@@ -6,7 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -1182,18 +1181,21 @@ export default function App() {
         @media(max-width:768px){
           .lp-features{grid-template-columns:1fr}
           .lp-stats{gap:20px}
-          .lp-nav{padding:12px 4%}
-          .lp-nav-brand{font-size:16px}
+          .lp-nav{padding:10px 4%;height:56px}
+          .lp-nav-brand{font-size:15px}
+          .lp-nav-logo svg{width:26px;height:26px}
           .lp-nav-btns{gap:6px}
-          .lp-btn-out{padding:7px 12px;font-size:12px}
-          .lp-btn-pri{padding:7px 12px;font-size:12px}
-          .lp-h1{font-size:32px;letter-spacing:-1px}
-          .lp-hero{padding:50px 5% 40px}
-          .lp-sub{font-size:14px}
-          .lp-cta-pri,.lp-cta-sec{padding:12px 24px;font-size:14px}
-          .lp-stat-n{font-size:28px}
-          .lp-stat-l{font-size:10px}
-          .lp-features{padding:40px 4%}
+          .lp-btn-out{padding:6px 12px;font-size:12px}
+          .lp-btn-pri{padding:6px 12px;font-size:12px}
+          .lp-h1{font-size:30px;letter-spacing:-1px}
+          .lp-hero{padding:40px 5% 32px}
+          .lp-sub{font-size:13px}
+          .lp-cta-pri,.lp-cta-sec{padding:12px 20px;font-size:13px;width:100%;text-align:center}
+          .lp-ctas{flex-direction:column;align-items:center;gap:10px}
+          .lp-stat-n{font-size:26px}
+          .lp-stat-l{font-size:9px}
+          .lp-features{padding:32px 4%}
+          .lp-features{grid-template-columns:1fr}
           .lp-feat{padding:18px}
         }
       `}</style></style>
@@ -1261,19 +1263,19 @@ export default function App() {
     const isReg = authMode==="register";
     return (
       <><style>{CSS}</style>
-      <div className={`auth-wrap ${t.dir==="rtl"?"rtl-layout":"ltr-layout"}`} dir={t.dir}>
-        <div className="auth-card">
+      <div className={`auth-wrap ${t.dir==="rtl"?"rtl-layout":"ltr-layout"}`} dir={t.dir} style={{alignItems:"flex-start"}}>
+        <div className="auth-card" style={{marginTop:0}}>
           <button onClick={()=>setShowLanding(true)} style={{
-            display:"inline-flex",alignItems:"center",gap:6,
-            background:"rgba(255,255,255,.06)",
-            border:"1px solid rgba(255,255,255,.12)",
-            color:"rgba(255,255,255,.6)",fontSize:12,fontWeight:600,
-            cursor:"pointer",padding:"6px 12px 6px 10px",
-            borderRadius:20,marginBottom:20,transition:".15s",
-            letterSpacing:".01em"
+            display:"flex",alignItems:"center",gap:7,
+            background:"rgba(16,185,129,.08)",
+            border:"1px solid rgba(16,185,129,.2)",
+            color:"#10b981",fontSize:12,fontWeight:700,
+            cursor:"pointer",padding:"8px 14px",
+            borderRadius:20,marginBottom:22,transition:".15s",
+            width:"fit-content"
           }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Home
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            ← Home
           </button>
           <div className="auth-logo">
             <div className="auth-sh">
