@@ -6,6 +6,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -1301,10 +1302,44 @@ export default function App() {
             <button className="lp-cta-sec" onClick={enterDemo}>🚀 Try live demo</button>
           </div>
           <div className="lp-stats">
-            <div><div className="lp-stat-n">137</div><div className="lp-stat-l">avg apps per company</div></div>
-            <div><div className="lp-stat-n">68%</div><div className="lp-stat-l">never audited</div></div>
-            <div><div className="lp-stat-n">$4.5M</div><div className="lp-stat-l">avg cost of SaaS breach</div></div>
-            <div><div className="lp-stat-n">90s</div><div className="lp-stat-l">to first scan</div></div>
+            {(()=>{
+              const stats = [
+                {end:137, suffix:"", label:"avg apps per company"},
+                {end:68, suffix:"%", label:"never audited"},
+                {end:4.5, suffix:"M", prefix:"$", label:"avg cost of SaaS breach", isFloat:true},
+                {end:90, suffix:"s", label:"to first scan"},
+              ];
+              return stats.map(({end,suffix,prefix="",label,isFloat})=>{
+                const [val,setVal] = React.useState(0);
+                const [started,setStarted] = React.useState(false);
+                const ref = React.useRef(null);
+                React.useEffect(()=>{
+                  const obs = new IntersectionObserver(([e])=>{if(e.isIntersecting&&!started){setStarted(true);}},{threshold:0.5});
+                  if(ref.current) obs.observe(ref.current);
+                  return ()=>obs.disconnect();
+                },[]);
+                React.useEffect(()=>{
+                  if(!started) return;
+                  let start = 0;
+                  const duration = 1800;
+                  const step = 16;
+                  const steps = duration/step;
+                  const inc = end/steps;
+                  const timer = setInterval(()=>{
+                    start += inc;
+                    if(start >= end){ setVal(end); clearInterval(timer); }
+                    else setVal(isFloat ? Math.round(start*10)/10 : Math.floor(start));
+                  }, step);
+                  return ()=>clearInterval(timer);
+                },[started]);
+                return (
+                  <div key={label} ref={ref}>
+                    <div className="lp-stat-n">{prefix}{isFloat?val.toFixed(1):val}{suffix}</div>
+                    <div className="lp-stat-l">{label}</div>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
 
@@ -1463,7 +1498,6 @@ export default function App() {
 
         <footer className="lp-footer">
           <span style={{fontSize:14,fontWeight:700,color:"rgba(255,255,255,.4)"}}>🛡️ ScopeGuard</span>
-          <div className="lp-footer-links"><a href="#">Features</a><a href="#">Pricing</a><a href="#">Contact</a></div>
           <span style={{fontSize:11,color:"rgba(255,255,255,.2)"}}>© 2026 ScopeGuard. All rights reserved.</span>
         </footer>
       </div></>
