@@ -1141,8 +1141,9 @@ export default function App() {
     </div></>
   );
 
-  // ── AUTH ──
-  if (showLanding && !isDemo) {
+  // ── ROUTING ──
+  // 1. Landing page (shown first, or when clicking Home)
+  if (showLanding) {
     return (
       <><style>{CSS}<style>{`
         .lp{min-height:100vh;background:linear-gradient(135deg,#060d1a 0%,#0a1628 50%,#061a10 100%);display:flex;flex-direction:column;font-family:'Inter',-apple-system,sans-serif;color:#fff;overflow-x:hidden;overflow-y:auto}
@@ -1261,9 +1262,10 @@ export default function App() {
         </footer>
       </div></>
     );
+  }
 
-    if (session) { setShowLanding(false); return null; }
-
+  // 2. Auth form (no session, not landing, not demo)
+  if (!session && !isDemo) {
     const isReg = authMode==="register";
     return (
       <><style>{CSS}{`
