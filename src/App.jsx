@@ -6,7 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -937,7 +936,7 @@ export default function App() {
   };
 
   const enterDemo = () => {
-    // Set all demo state at once
+    console.log("enterDemo called, isDemo:", isDemo, "showLanding:", showLanding);
     setIsDemo(true);
     setShowLanding(false);
     setSession({ user: { id:"demo", email:"demo@scopeguard.io" } });
@@ -949,6 +948,7 @@ export default function App() {
     setPlatforms(DEMO_PLATFORMS);
     setAppLoading(false);
     setPage("dashboard");
+    console.log("enterDemo done");
   };
 
   const doSignOut = async () => {
