@@ -925,11 +925,12 @@ export default function App() {
     return () => supabase.removeChannel(channel);
   }, [profile?.org_id]);
 
-  const load = useCallback(async () => {
-    if (!session?.user?.id) return;
+  const load = useCallback(async (userId) => {
+    const uid = userId || session?.user?.id;
+    if (!uid) return;
     setBusy(true);
     try {
-      const { data: prof } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+      const { data: prof } = await supabase.from("profiles").select("*").eq("id", uid).single();
       if (prof) { setProfile(prof); if (prof.language) setLang(prof.language); }
       if (!prof?.org_id) return;
 
@@ -947,7 +948,7 @@ export default function App() {
       setRevs(rR.data || []);
       setPlatforms(pR.data || []);
     } finally { setBusy(false); }
-  }, [session]);
+  }, [session?.user?.id]);
 
   const doSignIn = async e => {
     e.preventDefault(); setAuthBusy(true); setAuthErr("");
@@ -1808,9 +1809,9 @@ export default function App() {
         {justConnected && (
           <div style={{background:"rgba(16,185,129,.1)",border:"1px solid rgba(16,185,129,.3)",borderRadius:12,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
             <span style={{fontSize:13,fontWeight:600,color:"#10b981"}}>✅ {justConnected} connected successfully!</span>
-            <button onClick={()=>{
-              localStorage.setItem("sg-after-oauth","integrations");
-              window.location.reload();
+            <button onClick={async()=>{
+              const {data:{session:s}} = await supabase.auth.getSession();
+              if(s){setSession(s);load(s.user.id);}
             }} style={{background:"#10b981",border:"none",color:"#fff",padding:"6px 16px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}}>Refresh →</button>
           </div>
         )}
