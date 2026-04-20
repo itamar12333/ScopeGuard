@@ -1151,14 +1151,11 @@ export default function App() {
     setScanningPlatform(platformName);
     try {
       const fnName = platformName.toLowerCase() === "github" ? "github-scan" : "slack-scan";
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/${fnName}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
-        body: JSON.stringify({ org_id: profile.org_id, platform_id: platform.id }),
+      const { data, error } = await supabase.functions.invoke(fnName, {
+        body: { org_id: profile.org_id, platform_id: platform.id }
       });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      showToast(`✓ ${platformName} scan complete — ${data.apps_found || 0} apps found`);
+      if (error) throw new Error(error.message);
+      showToast(`✓ ${platformName} scan complete — ${data?.apps_found || 0} apps found`);
       setTimeout(() => load(session?.user?.id), 1000);
     } catch (err) {
       showToast(`Scan error: ${err.message}`);
