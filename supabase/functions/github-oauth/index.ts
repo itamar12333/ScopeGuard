@@ -38,9 +38,11 @@ serve(async (req) => {
     }
 
     if (!code || !orgId) {
-      const errorUrl = `https://scopguard.com/integrations?error=missing_params`;
-      return Response.redirect(errorUrl, 302);
+      console.log("Missing params - code:", !!code, "orgId:", !!orgId, "state:", state);
+      return Response.redirect(`https://scopguard.com/?error=missing_params`, 302);
     }
+
+    console.log("Got code and orgId:", orgId);
 
     const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
       method: "POST",
@@ -48,35 +50,26 @@ serve(async (req) => {
       body: JSON.stringify({ client_id: GITHUB_CLIENT_ID, client_secret: GITHUB_CLIENT_SECRET, code }),
     });
     const tokenData = await tokenRes.json();
+    console.log("Token response:", JSON.stringify(tokenData));
     const accessToken = tokenData.access_token;
     if (!accessToken) throw new Error(`No access token: ${JSON.stringify(tokenData)}`);
 
-    const userRes = await fetch("https://api.github.com/user", {
-      headers: { Authorization: `Bearer ${accessToken}`, "User-Agent": "ScopeGuard" },
-    });
-    const githubUser = await userRes.json();
-
-    const orgsRes = await fetch("https://api.github.com/user/orgs", {
-      headers: { Authorization: `Bearer ${accessToken}`, "User-Agent": "ScopeGuard" },
-    });
-    const orgs = await orgsRes.json();
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+    console.log("Supabase URL:", SUPABASE_URL);
+    console.log("Has service key:", !!SUPABASE_SERVICE_KEY);
 
-    const { data: platform } = await supabase.from("platforms").upsert({
+    const { data: platform, error: platErr } = await supabase.from("platforms").upsert({
       org_id: orgId, name: "GitHub", status: "active",
       last_synced_at: new Date().toISOString(),
     }, { onConflict: "org_id,name" }).select().single();
+    console.log("Platform upsert:", JSON.stringify(platform), "error:", JSON.stringify(platErr));
 
-    await supabase.from("platform_tokens").upsert({
+    const { error: tokenErr } = await supabase.from("platform_tokens").upsert({
       org_id: orgId, platform: "github", access_token: accessToken,
-      meta: { github_user: githubUser.login, orgs: Array.isArray(orgs) ? orgs.map((o: any) => o.login) : [] },
+      meta: { github_user: "github" },
       updated_at: new Date().toISOString(),
     }, { onConflict: "org_id,platform" });
-
-    if (platform?.id) {
-      await supabase.functions.invoke("github-scan", { body: { org_id: orgId, platform_id: platform.id } });
-    }
+    console.log("Token upsert error:", JSON.stringify(tokenErr));
 
     // Redirect back to app with success
     if (req.method === "GET") {
