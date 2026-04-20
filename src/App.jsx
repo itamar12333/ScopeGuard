@@ -1151,15 +1151,26 @@ export default function App() {
     setScanningPlatform(platformName);
     try {
       const fnName = platformName.toLowerCase() === "github" ? "github-scan" : "slack-scan";
-      const { data, error } = await supabase.functions.invoke(fnName, {
-        body: { org_id: profile.org_id, platform_id: platform.id }
+      const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
+      const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
+      const res = await fetch(`${SB_URL}/functions/v1/${fnName}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SB_KEY,
+          "Authorization": `Bearer ${SB_KEY}`,
+        },
+        body: JSON.stringify({ org_id: profile.org_id, platform_id: platform.id }),
       });
-      if (error) throw new Error(error.message);
+      const data = await res.json();
+      console.log("Scan result:", data);
+      if (data.error) throw new Error(data.error);
       const found = data?.apps_found || 0;
       showToast(`✓ ${platformName} scan complete — ${found} apps found`);
       localStorage.setItem("sg-after-oauth", "integrations");
       setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
+      console.error("Scan error:", err);
       showToast(`Scan error: ${err.message}`);
       setScanningPlatform(null);
     }
