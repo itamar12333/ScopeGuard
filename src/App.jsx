@@ -1156,7 +1156,9 @@ export default function App() {
       });
       if (error) throw new Error(error.message);
       showToast(`✓ ${platformName} scan complete — ${data?.apps_found || 0} apps found`);
-      setTimeout(() => load(session?.user?.id), 1000);
+      // Force full reload
+      const { data: { session: s } } = await supabase.auth.getSession();
+      if (s) await load(s.user.id);
     } catch (err) {
       showToast(`Scan error: ${err.message}`);
     }
