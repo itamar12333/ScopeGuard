@@ -836,14 +836,13 @@ export default function App() {
           const decoded = JSON.parse(atob(state));
           const orgId = decoded.org_id;
           const userId = decoded.user_id;
-          const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-          const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-          // Save flag FIRST, then call API in background
+          const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
+          const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
           localStorage.setItem("sg-after-oauth", "integrations");
           localStorage.setItem("sg-just-connected", "GitHub");
-          fetch(`${SUPABASE_URL}/functions/v1/github-oauth`, {
+          fetch(`${SB_URL}/functions/v1/github-oauth`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
+            headers: { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
             body: JSON.stringify({ code, org_id: orgId, user_id: userId }),
           }).then(r => r.json()).then(data => {
             console.log("GitHub OAuth result:", data);
@@ -861,13 +860,13 @@ export default function App() {
           const decodedSlack = JSON.parse(atob(state));
           const orgId = decodedSlack.org_id;
           const userId = decodedSlack.user_id;
-          const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-          const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+          const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
+          const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
           localStorage.setItem("sg-after-oauth", "integrations");
           localStorage.setItem("sg-just-connected", "Slack");
-          fetch(`${SUPABASE_URL}/functions/v1/slack-oauth`, {
+          fetch(`${SB_URL}/functions/v1/slack-oauth`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
+            headers: { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
             body: JSON.stringify({ code, org_id: orgId, user_id: userId }),
           }).then(r => r.json()).then(data => {
             console.log("Slack OAuth result:", data);
