@@ -828,7 +828,9 @@ export default function App() {
       const state = params.get("state");
       if (code && state) {
         try {
-          const { orgId, userId } = JSON.parse(atob(state));
+          const decoded = JSON.parse(atob(state));
+          console.log("GitHub callback - decoded state:", decoded, "code:", code?.substring(0,8));
+          const { orgId, userId } = decoded;
           const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
           const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
           fetch(`${SUPABASE_URL}/functions/v1/github-oauth`, {
