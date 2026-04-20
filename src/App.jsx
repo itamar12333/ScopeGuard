@@ -6,6 +6,8 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
+
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -1071,7 +1073,7 @@ export default function App() {
 
   const connectSlack = () => {
     const redirectUri = `${window.location.origin}/auth/slack/callback`;
-    const scope = "channels:read,groups:read,team:read,users:read,apps:read";
+    const scope = "channels:read,groups:read,team:read,users:read";
     const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
     window.location.href = `https://slack.com/oauth/v2/authorize?client_id=${SLACK_CLIENT_ID}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
   };
