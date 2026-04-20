@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
@@ -1156,14 +1155,14 @@ export default function App() {
         body: { org_id: profile.org_id, platform_id: platform.id }
       });
       if (error) throw new Error(error.message);
-      showToast(`✓ ${platformName} scan complete — ${data?.apps_found || 0} apps found`);
-      // Force full reload
-      const { data: { session: s } } = await supabase.auth.getSession();
-      if (s) await load(s.user.id);
+      const found = data?.apps_found || 0;
+      showToast(`✓ ${platformName} scan complete — ${found} apps found`);
+      localStorage.setItem("sg-after-oauth", "integrations");
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       showToast(`Scan error: ${err.message}`);
+      setScanningPlatform(null);
     }
-    setScanningPlatform(null);
   };
 
   const doScan = () => {
