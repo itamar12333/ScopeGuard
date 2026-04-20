@@ -1071,7 +1071,7 @@ export default function App() {
 
   const connectSlack = () => {
     const redirectUri = `${window.location.origin}/auth/slack/callback`;
-    const scope = "admin,apps:read,oauth.v2.access";
+    const scope = "channels:read,groups:read,team:read,users:read,apps:read";
     const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
     window.location.href = `https://slack.com/oauth/v2/authorize?client_id=${SLACK_CLIENT_ID}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
   };
@@ -1301,37 +1301,10 @@ export default function App() {
             <button className="lp-cta-sec" onClick={enterDemo}>🚀 Try live demo</button>
           </div>
           <div className="lp-stats">
-            {[
-              {end:137, suffix:"", prefix:"", label:"avg apps per company"},
-              {end:68, suffix:"%", prefix:"", label:"never audited"},
-              {end:4.5, suffix:"M", prefix:"$", label:"avg cost of SaaS breach", isFloat:true},
-              {end:90, suffix:"s", prefix:"", label:"to first scan"},
-            ].map(({end,suffix,prefix,label,isFloat})=>{
-              const AnimStat = () => {
-                const [val,setVal] = useState(0);
-                const [started,setStarted] = useState(false);
-                const ref = useRef(null);
-                useEffect(()=>{
-                  const obs = new IntersectionObserver(([e])=>{if(e.isIntersecting)setStarted(true)},{threshold:0.5});
-                  if(ref.current) obs.observe(ref.current);
-                  return ()=>obs.disconnect();
-                },[]);
-                useEffect(()=>{
-                  if(!started) return;
-                  let cur = 0;
-                  const steps = 60;
-                  const inc = end/steps;
-                  const timer = setInterval(()=>{
-                    cur += inc;
-                    if(cur >= end){ setVal(end); clearInterval(timer); }
-                    else setVal(isFloat ? Math.round(cur*10)/10 : Math.floor(cur));
-                  }, 25);
-                  return ()=>clearInterval(timer);
-                },[started]);
-                return <div ref={ref}><div className="lp-stat-n">{prefix}{isFloat?val.toFixed(1):val}{suffix}</div><div className="lp-stat-l">{label}</div></div>;
-              };
-              return <AnimStat key={label}/>;
-            })}
+            <div><div className="lp-stat-n">137</div><div className="lp-stat-l">avg apps per company</div></div>
+            <div><div className="lp-stat-n">68%</div><div className="lp-stat-l">never audited</div></div>
+            <div><div className="lp-stat-n">$4.5M</div><div className="lp-stat-l">avg cost of SaaS breach</div></div>
+            <div><div className="lp-stat-n">90s</div><div className="lp-stat-l">to first scan</div></div>
           </div>
         </div>
 
