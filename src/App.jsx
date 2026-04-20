@@ -1150,30 +1150,106 @@ export default function App() {
     if (!platform) return;
     setScanningPlatform(platformName);
     try {
-      const fnName = platformName.toLowerCase() === "github" ? "github-scan" : "slack-scan";
-      const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
-      const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
-      const res = await fetch(`${SB_URL}/functions/v1/${fnName}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SB_KEY,
-          "Authorization": `Bearer ${SB_KEY}`,
-        },
-        body: JSON.stringify({ org_id: profile.org_id, platform_id: platform.id }),
-      });
-      const data = await res.json();
-      console.log("Scan result:", data);
-      if (data.error) throw new Error(data.error);
-      const found = data?.apps_found || 0;
-      showToast(`✓ ${platformName} scan complete — ${found} apps found`);
-      localStorage.setItem("sg-after-oauth", "integrations");
-      setTimeout(() => window.location.reload(), 1500);
+      // Get token from Supabase directly
+      const { data: tokenRow } = await supabase
+        .from("platform_tokens")
+        .select("access_token")
+        .eq("org_id", profile.org_id)
+        .eq("platform", platformName.toLowerCase())
+        .single();
+
+      if (!tokenRow?.access_token) throw new Error("No token found. Please reconnect.");
+
+      const token = tokenRow.access_token;
+      const appsToSave = [];
+
+      if (platformName === "GitHub") {
+        const ghHeaders = { Authorization: `Bearer ${token}`, "User-Agent": "ScopeGuard" };
+
+        // Get repos
+        const reposRes = await fetch("https://api.github.com/user/repos?per_page=100&type=all", { headers: ghHeaders });
+        const repos = await reposRes.json();
+
+        // Get token scopes
+        const scopeHeader = reposRes.headers.get("x-oauth-scopes") || "";
+        const scopes = scopeHeader.split(",").map(s => s.trim()).filter(Boolean);
+
+        // Add token as app
+        if (scopes.length > 0) {
+          let score = 10;
+          if (scopes.some(s => ["admin:org","delete_repo","write:org"].includes(s))) score += 40;
+          if (scopes.some(s => ["repo","workflow"].includes(s))) score += 25;
+          appsToSave.push({
+            org_id: profile.org_id, platform_id: platform.id,
+            name: "GitHub OAuth Connection", publisher: "GitHub",
+            verified: true, connection_type: "OAuth",
+            risk_score: Math.min(score, 100),
+            severity: score >= 70 ? "critical" : score >= 50 ? "high" : score >= 30 ? "medium" : "low",
+            users_affected: 1, users_type: "users",
+            is_stale: false, is_revoked: false,
+            last_active_at: new Date().toISOString(),
+            connected_at: new Date().toISOString(),
+            notes: `Scopes: ${scopes.join(", ")}`,
+          });
+        }
+
+        // Get webhooks per repo
+        if (Array.isArray(repos)) {
+          for (const repo of repos.slice(0, 15)) {
+            const hooksRes = await fetch(`https://api.github.com/repos/${repo.full_name}/hooks`, { headers: ghHeaders });
+            if (!hooksRes.ok) continue;
+            const hooks = await hooksRes.json();
+            if (!Array.isArray(hooks)) continue;
+            for (const hook of hooks) {
+              const url = hook.config?.url || "";
+              let domain = url;
+              try { domain = new URL(url).hostname; } catch {}
+              const daysSince = Math.floor((Date.now() - new Date(hook.created_at).getTime()) / 86400000);
+              appsToSave.push({
+                org_id: profile.org_id, platform_id: platform.id,
+                name: `Webhook → ${domain || "unknown"}`,
+                publisher: domain || "unknown",
+                verified: hook.active || false,
+                connection_type: "Webhook",
+                risk_score: 45, severity: "medium",
+                users_affected: 1, users_type: "repos",
+                is_stale: daysSince > 90,
+                is_revoked: false,
+                last_active_at: hook.updated_at || hook.created_at,
+                connected_at: hook.created_at,
+                notes: `Repo: ${repo.full_name} | Events: ${(hook.events||[]).join(", ")}`,
+              });
+            }
+          }
+        }
+      }
+
+      // Save to Supabase
+      for (const app of appsToSave) {
+        await supabase.from("connected_apps").upsert(app, { onConflict: "org_id,platform_id,name" });
+      }
+
+      // Update last_synced
+      await supabase.from("platforms")
+        .update({ last_synced_at: new Date().toISOString() })
+        .eq("id", platform.id);
+
+      showToast(`✓ ${platformName} scan complete — ${appsToSave.length} apps found`);
+
+      // Reload data
+      setPlatforms(prev => prev.map(p => p.id === platform.id ? { ...p, last_synced_at: new Date().toISOString() } : p));
+      const { data: newApps } = await supabase
+        .from("connected_apps")
+        .select("*, platform:platforms(name), permissions:app_permissions(*), compliance:app_compliance_flags(framework:compliance_frameworks(name,short_code))")
+        .eq("org_id", profile.org_id)
+        .order("risk_score", { ascending: false });
+      setApps(newApps || []);
+
     } catch (err) {
       console.error("Scan error:", err);
       showToast(`Scan error: ${err.message}`);
-      setScanningPlatform(null);
     }
+    setScanningPlatform(null);
   };
 
   const doScan = () => {
