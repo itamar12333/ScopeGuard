@@ -6,6 +6,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -841,7 +842,10 @@ export default function App() {
             window.history.replaceState({}, "", "/");
             setShowLanding(false);
             setPage("integrations");
-            setTimeout(() => load(), 1500);
+            // Wait for session to load before calling load()
+            supabase.auth.getSession().then(({ data: { session: s } }) => {
+              if (s) { setSession(s); setTimeout(() => load(), 500); }
+            });
           }).catch(err => console.error("GitHub OAuth error:", err));
         } catch(e) { console.error("State parse error:", e); }
       }
@@ -866,7 +870,9 @@ export default function App() {
             window.history.replaceState({}, "", "/");
             setShowLanding(false);
             setPage("integrations");
-            setTimeout(() => load(), 1500);
+            supabase.auth.getSession().then(({ data: { session: s } }) => {
+              if (s) { setSession(s); setTimeout(() => load(), 500); }
+            });
           }).catch(err => console.error("Slack OAuth error:", err));
         } catch(e) { console.error("State parse error:", e); }
       }
