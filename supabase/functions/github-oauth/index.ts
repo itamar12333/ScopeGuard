@@ -18,30 +18,28 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    // Accept params from URL (GET callback) or body (POST)
     const url = new URL(req.url);
-    let code, orgId;
+    let code, orgId, userId;
 
     if (req.method === "GET") {
+      // Direct callback from GitHub
       code = url.searchParams.get("code");
       const state = url.searchParams.get("state");
       if (state) {
         const decoded = JSON.parse(atob(state));
         orgId = decoded.org_id;
+        userId = decoded.user_id;
       }
     } else {
       const body = await req.json();
       code = body.code;
       orgId = body.org_id;
-      // Also check state
-      if (!orgId && body.state) {
-        const decoded = JSON.parse(atob(body.state));
-        orgId = decoded.org_id;
-      }
+      userId = body.user_id;
     }
 
     if (!code || !orgId) {
-      return new Response(JSON.stringify({ error: "Missing params", code: !!code, orgId: !!orgId }), { status: 400, headers: corsHeaders });
+      const errorUrl = `https://scopguard.com/integrations?error=missing_params`;
+      return Response.redirect(errorUrl, 302);
     }
 
     const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
@@ -80,10 +78,18 @@ serve(async (req) => {
       await supabase.functions.invoke("github-scan", { body: { org_id: orgId, platform_id: platform.id } });
     }
 
+    // Redirect back to app with success
+    if (req.method === "GET") {
+      return Response.redirect(`https://scopguard.com/?connected=github`, 302);
+    }
+
     return new Response(JSON.stringify({ success: true, user: githubUser.login }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
+    if (req.method === "GET") {
+      return Response.redirect(`https://scopguard.com/?error=${encodeURIComponent(err.message)}`, 302);
+    }
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

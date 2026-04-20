@@ -827,6 +827,12 @@ export default function App() {
     // Handle OAuth callbacks
     const path = window.location.pathname;
     const params = new URLSearchParams(window.location.search);
+
+    // Handle successful OAuth redirect from Edge Function
+    if (params.get("connected")) {
+      localStorage.setItem("sg-just-connected", params.get("connected") || "github");
+      window.history.replaceState({}, "", "/");
+    }
     
     if (path === "/auth/github/callback") {
       const code = params.get("code");
@@ -1123,12 +1129,11 @@ export default function App() {
 
   // OAuth connection handlers
   const connectGitHub = () => {
-    console.log("connectGitHub - org_id:", profile?.org_id, "user_id:", session?.user?.id);
-    if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing the page."); return; }
-    const redirectUri = `${window.location.origin}/auth/github/callback`;
+    if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing."); return; }
+    const redirectUri = `https://uqrqfwhvchpcmzrfqoyd.supabase.co/functions/v1/github-oauth`;
     const scope = "read:org,repo,admin:org";
     const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`;
   };
 
   const connectSlack = () => {
