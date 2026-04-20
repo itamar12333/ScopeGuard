@@ -6,6 +6,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -825,9 +826,22 @@ export default function App() {
       const code = params.get("code");
       const state = params.get("state");
       if (code && state) {
-        const { orgId, userId } = JSON.parse(atob(state));
-        supabase.functions.invoke("github-oauth", { body: { code, org_id: orgId, user_id: userId } })
-          .then(() => { window.history.replaceState({}, "", "/"); setPage("integrations"); setShowLanding(false); });
+        try {
+          const { orgId, userId } = JSON.parse(atob(state));
+          const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+          const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+          fetch(`${SUPABASE_URL}/functions/v1/github-oauth`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
+            body: JSON.stringify({ code, org_id: orgId, user_id: userId }),
+          }).then(r => r.json()).then(data => {
+            console.log("GitHub OAuth result:", data);
+            window.history.replaceState({}, "", "/");
+            setPage("integrations");
+            setShowLanding(false);
+            load();
+          }).catch(err => console.error("GitHub OAuth error:", err));
+        } catch(e) { console.error("State parse error:", e); }
       }
     }
     
@@ -835,9 +849,22 @@ export default function App() {
       const code = params.get("code");
       const state = params.get("state");
       if (code && state) {
-        const { orgId, userId } = JSON.parse(atob(state));
-        supabase.functions.invoke("slack-oauth", { body: { code, org_id: orgId, user_id: userId } })
-          .then(() => { window.history.replaceState({}, "", "/"); setPage("integrations"); setShowLanding(false); });
+        try {
+          const { orgId, userId } = JSON.parse(atob(state));
+          const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+          const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+          fetch(`${SUPABASE_URL}/functions/v1/slack-oauth`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
+            body: JSON.stringify({ code, org_id: orgId, user_id: userId }),
+          }).then(r => r.json()).then(data => {
+            console.log("Slack OAuth result:", data);
+            window.history.replaceState({}, "", "/");
+            setPage("integrations");
+            setShowLanding(false);
+            load();
+          }).catch(err => console.error("Slack OAuth error:", err));
+        } catch(e) { console.error("State parse error:", e); }
       }
     }
 
@@ -1086,6 +1113,8 @@ export default function App() {
 
   // OAuth connection handlers
   const connectGitHub = () => {
+    console.log("connectGitHub - org_id:", profile?.org_id, "user_id:", session?.user?.id);
+    if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing the page."); return; }
     const redirectUri = `${window.location.origin}/auth/github/callback`;
     const scope = "read:org,repo,admin:org";
     const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
@@ -1093,6 +1122,8 @@ export default function App() {
   };
 
   const connectSlack = () => {
+    console.log("connectSlack - org_id:", profile?.org_id, "user_id:", session?.user?.id);
+    if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing the page."); return; }
     const redirectUri = `${window.location.origin}/auth/slack/callback`;
     const scope = "channels:read,groups:read,team:read,users:read";
     const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
