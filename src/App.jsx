@@ -1808,10 +1808,9 @@ export default function App() {
         {justConnected && (
           <div style={{background:"rgba(16,185,129,.1)",border:"1px solid rgba(16,185,129,.3)",borderRadius:12,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
             <span style={{fontSize:13,fontWeight:600,color:"#10b981"}}>✅ {justConnected} connected successfully!</span>
-            <button onClick={async ()=>{
-              const {data:{session:s}} = await supabase.auth.getSession();
-              if(s){setSession(s);setTimeout(()=>load(),300);}
-              else load();
+            <button onClick={()=>{
+              localStorage.setItem("sg-after-oauth","integrations");
+              window.location.reload();
             }} style={{background:"#10b981",border:"none",color:"#fff",padding:"6px 16px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}}>Refresh →</button>
           </div>
         )}
