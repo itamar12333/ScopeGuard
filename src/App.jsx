@@ -6,8 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -842,6 +840,7 @@ export default function App() {
           const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
           // Save flag FIRST, then call API in background
           localStorage.setItem("sg-after-oauth", "integrations");
+          localStorage.setItem("sg-just-connected", "GitHub");
           fetch(`${SUPABASE_URL}/functions/v1/github-oauth`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
@@ -865,6 +864,7 @@ export default function App() {
           const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
           const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
           localStorage.setItem("sg-after-oauth", "integrations");
+          localStorage.setItem("sg-just-connected", "Slack");
           fetch(`${SUPABASE_URL}/functions/v1/slack-oauth`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
@@ -1793,15 +1793,24 @@ export default function App() {
 
   // ── INTEGRATIONS PAGE ──
   const IntegrationsPage = () => {
+    const justConnected = localStorage.getItem("sg-just-connected");
+    if (justConnected) localStorage.removeItem("sg-just-connected");
+
     const integrationDefs = [
-      { name:"GitHub", icon:"🐙", color:"#24292e", desc:"Discover all OAuth apps and GitHub App installations connected to your organization's repositories.", scopes:["read:org","admin:app","repo"], onConnect:connectGitHub },
-      { name:"Slack", icon:"💬", color:"#4A154B", desc:"Find all apps installed in your Slack workspace, including their scopes and access levels.", scopes:["apps:read","admin"], onConnect:connectSlack },
-      { name:"Google Workspace", icon:"🔵", color:"#0f9d58", desc:"Scan all third-party apps connected to your Google Workspace via OAuth.", scopes:["admin.googleapis.com"], onConnect:()=>showToast("Coming soon — Google Workspace") },
-      { name:"Salesforce", icon:"☁️", color:"#00A1E0", desc:"Identify Connected Apps and external OAuth integrations in your Salesforce org.", scopes:["full","api"], onConnect:()=>showToast("Coming soon — Salesforce") },
+      { name:"GitHub", icon:"🐙", color:"#24292e", desc:"Discover all OAuth apps and GitHub App installations connected to your organization's repositories.", onConnect:connectGitHub },
+      { name:"Slack", icon:"💬", color:"#4A154B", desc:"Find all apps installed in your Slack workspace, including their scopes and access levels.", onConnect:connectSlack },
+      { name:"Google Workspace", icon:"🔵", color:"#0f9d58", desc:"Scan all third-party apps connected to your Google Workspace via OAuth.", onConnect:()=>showToast("Coming soon!") },
+      { name:"Salesforce", icon:"☁️", color:"#00A1E0", desc:"Identify Connected Apps and OAuth integrations in your Salesforce org.", onConnect:()=>showToast("Coming soon!") },
     ];
 
     return (
       <div style={{display:"flex",flexDirection:"column",gap:20}}>
+        {justConnected && (
+          <div style={{background:"rgba(16,185,129,.1)",border:"1px solid rgba(16,185,129,.3)",borderRadius:12,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+            <span style={{fontSize:13,fontWeight:600,color:"#10b981"}}>✅ {justConnected} connected successfully!</span>
+            <button onClick={()=>load()} style={{background:"#10b981",border:"none",color:"#fff",padding:"6px 16px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}}>Refresh →</button>
+          </div>
+        )}
         <div className="card">
           <div style={{fontSize:14,fontWeight:700,color:"var(--text)",marginBottom:6}}>{t.connectPlatforms}</div>
           <div style={{fontSize:12,color:"var(--text2)"}}>{t.connectDesc}</div>
@@ -1828,11 +1837,9 @@ export default function App() {
                 <div style={{display:"flex",gap:8}}>
                   {!connected
                     ?<button className="int-btn connect" onClick={int.onConnect}><Icon name="link" size={14} color="#fff"/> {int.name==="GitHub"?t.connectGithub:int.name==="Slack"?t.connectSlack:`Connect ${int.name}`}</button>
-                    :<>
-                      <button className={`int-btn ${isScanning?"scanning":"scan"}`} style={{flex:1}} onClick={()=>triggerScan(int.name)} disabled={isScanning}>
+                    :<button className={`int-btn ${isScanning?"scanning":"scan"}`} style={{flex:1}} onClick={()=>triggerScan(int.name)} disabled={isScanning}>
                         {isScanning?<><div className="spinner" style={{width:14,height:14,border:"2px solid #e2e8f0",borderTopColor:"#10b981"}}/> {t.scanning}</>:<><Icon name="check" size={14} color="#fff"/> {t.scanNow}</>}
                       </button>
-                    </>
                   }
                 </div>
                 {connected&&<div className="int-apps-found">✓ {apps.filter(a=>a.platform?.name===int.name).length} apps found</div>}
