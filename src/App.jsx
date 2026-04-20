@@ -765,13 +765,20 @@ export default function App() {
   const [appLoading, setAppLoading] = useState(true);
   const [authBusy, setAuthBusy] = useState(false);
   const [authErr, setAuthErr] = useState("");
-  const [showLanding, setShowLanding] = useState(true);
+  const [showLanding, setShowLanding] = useState(() => {
+    if (localStorage.getItem("sg-after-oauth")) return false;
+    return true;
+  });
+  const [page, setPage] = useState(() => {
+    const afterOAuth = localStorage.getItem("sg-after-oauth");
+    if (afterOAuth) { localStorage.removeItem("sg-after-oauth"); return afterOAuth; }
+    return "dashboard";
+  });
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [fullName, setFullName] = useState("");
   const [orgName, setOrgName] = useState("");
   const [roleVal, setRoleVal] = useState("it_manager");
-  const [page, setPage] = useState("dashboard");
   const [profile, setProfile] = useState(null);
   const [org, setOrg] = useState(null);
   const [apps, setApps] = useState([]);
@@ -876,13 +883,6 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s || null);
       setAppLoading(false);
-      // Check if we just came back from OAuth
-      const afterOAuth = localStorage.getItem("sg-after-oauth");
-      if (afterOAuth && s) {
-        localStorage.removeItem("sg-after-oauth");
-        setShowLanding(false);
-        setPage(afterOAuth);
-      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
