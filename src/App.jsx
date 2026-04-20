@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
