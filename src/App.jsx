@@ -6,8 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -819,8 +817,31 @@ export default function App() {
   const sec = active.length ? Math.max(0, Math.round(100 - active.reduce((s,a)=>s+(a.risk_score||0),0)/active.length)) : 0;
 
   useEffect(() => {
-    // Clean error params from URL
+    // Handle OAuth callbacks
+    const path = window.location.pathname;
     const params = new URLSearchParams(window.location.search);
+    
+    if (path === "/auth/github/callback") {
+      const code = params.get("code");
+      const state = params.get("state");
+      if (code && state) {
+        const { orgId, userId } = JSON.parse(atob(state));
+        supabase.functions.invoke("github-oauth", { body: { code, org_id: orgId, user_id: userId } })
+          .then(() => { window.history.replaceState({}, "", "/"); setPage("integrations"); setShowLanding(false); });
+      }
+    }
+    
+    if (path === "/auth/slack/callback") {
+      const code = params.get("code");
+      const state = params.get("state");
+      if (code && state) {
+        const { orgId, userId } = JSON.parse(atob(state));
+        supabase.functions.invoke("slack-oauth", { body: { code, org_id: orgId, user_id: userId } })
+          .then(() => { window.history.replaceState({}, "", "/"); setPage("integrations"); setShowLanding(false); });
+      }
+    }
+
+    // Clean error params from URL
     if (params.get("error")) window.history.replaceState({}, "", window.location.pathname);
 
     // Single auth check — getSession first, then listen for changes
