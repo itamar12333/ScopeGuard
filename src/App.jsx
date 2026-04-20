@@ -7,6 +7,7 @@ const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2r
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
 
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -837,9 +838,9 @@ export default function App() {
           }).then(r => r.json()).then(data => {
             console.log("GitHub OAuth result:", data);
             window.history.replaceState({}, "", "/");
-            setPage("integrations");
             setShowLanding(false);
-            load();
+            setPage("integrations");
+            setTimeout(() => load(), 1500);
           }).catch(err => console.error("GitHub OAuth error:", err));
         } catch(e) { console.error("State parse error:", e); }
       }
@@ -860,9 +861,9 @@ export default function App() {
           }).then(r => r.json()).then(data => {
             console.log("Slack OAuth result:", data);
             window.history.replaceState({}, "", "/");
-            setPage("integrations");
             setShowLanding(false);
-            load();
+            setPage("integrations");
+            setTimeout(() => load(), 1500);
           }).catch(err => console.error("Slack OAuth error:", err));
         } catch(e) { console.error("State parse error:", e); }
       }
