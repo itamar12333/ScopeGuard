@@ -6,8 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -830,7 +828,8 @@ export default function App() {
         try {
           const decoded = JSON.parse(atob(state));
           console.log("GitHub callback - decoded state:", decoded, "code:", code?.substring(0,8));
-          const { orgId, userId } = decoded;
+          const orgId = decoded.org_id;
+          const userId = decoded.user_id;
           const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
           const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
           fetch(`${SUPABASE_URL}/functions/v1/github-oauth`, {
@@ -853,7 +852,9 @@ export default function App() {
       const state = params.get("state");
       if (code && state) {
         try {
-          const { orgId, userId } = JSON.parse(atob(state));
+          const decodedSlack = JSON.parse(atob(state));
+          const orgId = decodedSlack.org_id;
+          const userId = decodedSlack.user_id;
           const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
           const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
           fetch(`${SUPABASE_URL}/functions/v1/slack-oauth`, {
@@ -887,7 +888,7 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => { if (session && !isDemo) load(); }, [session]);
+  useEffect(() => { if (session && !isDemo) load(); }, [session?.user?.id]);
 
   // Show onboarding for new users
   useEffect(() => {
