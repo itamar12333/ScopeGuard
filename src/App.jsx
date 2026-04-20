@@ -6,6 +6,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO DATA ────────────────────────────────────────────────────────────────
@@ -838,20 +839,8 @@ export default function App() {
             body: JSON.stringify({ code, org_id: orgId, user_id: userId }),
           }).then(r => r.json()).then(async data => {
             console.log("GitHub OAuth result:", data);
-            window.history.replaceState({}, "", "/");
-            setShowLanding(false);
-            setPage("integrations");
-            const { data: { session: s } } = await supabase.auth.getSession();
-            if (s) {
-              setSession(s);
-              setTimeout(async () => {
-                const { data: prof } = await supabase.from("profiles").select("*").eq("id", s.user.id).single();
-                if (prof?.org_id) {
-                  const { data: plats } = await supabase.from("platforms").select("*").eq("org_id", prof.org_id);
-                  setPlatforms(plats || []);
-                }
-              }, 800);
-            }
+            localStorage.setItem("sg-after-oauth", "integrations");
+            window.location.href = window.location.origin;
           }).catch(err => console.error("GitHub OAuth error:", err));
         } catch(e) { console.error("State parse error:", e); }
       }
@@ -871,14 +860,10 @@ export default function App() {
             method: "POST",
             headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
             body: JSON.stringify({ code, org_id: orgId, user_id: userId }),
-          }).then(r => r.json()).then(data => {
+          }).then(r => r.json()).then(async data => {
             console.log("Slack OAuth result:", data);
-            window.history.replaceState({}, "", "/");
-            setShowLanding(false);
-            setPage("integrations");
-            supabase.auth.getSession().then(({ data: { session: s } }) => {
-              if (s) { setSession(s); setTimeout(() => load(), 500); }
-            });
+            localStorage.setItem("sg-after-oauth", "integrations");
+            window.location.href = window.location.origin;
           }).catch(err => console.error("Slack OAuth error:", err));
         } catch(e) { console.error("State parse error:", e); }
       }
@@ -891,6 +876,13 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s || null);
       setAppLoading(false);
+      // Check if we just came back from OAuth
+      const afterOAuth = localStorage.getItem("sg-after-oauth");
+      if (afterOAuth && s) {
+        localStorage.removeItem("sg-after-oauth");
+        setShowLanding(false);
+        setPage(afterOAuth);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
