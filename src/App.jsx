@@ -6,6 +6,12 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 const GOOGLE_CLIENT_ID = "515432458343-9ur5ov4m0vvii0vet43tvv7vnvis7vev.apps.googleusercontent.com";
+
+const PLANS = {
+  free:       { name:"Free",       color:"#64748b", limit_apps:25,  limit_platforms:2,  limit_members:1,  scan_history:7,   pdf:false, soc2:false },
+  pro:        { name:"Pro",        color:"#10b981", limit_apps:9999, limit_platforms:10, limit_members:10, scan_history:365, pdf:true,  soc2:true  },
+  enterprise: { name:"Enterprise", color:"#a78bfa", limit_apps:9999, limit_platforms:99, limit_members:999,scan_history:365, pdf:true,  soc2:true  },
+};
 const LS_ENT_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/0eb1490c-5bb3-438f-b1a1-c068759031f9";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -786,6 +792,7 @@ export default function App() {
   const [orgName, setOrgName] = useState("");
   const [roleVal, setRoleVal] = useState("it_manager");
   const [profile, setProfile] = useState(null);
+  const [userPlan, setUserPlan] = useState("free");
   const [org, setOrg] = useState(null);
   const [apps, setApps] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -1592,8 +1599,26 @@ export default function App() {
             <span className="lp-nav-brand">ScopeGuard</span>
           </div>
           <div className="lp-nav-btns">
-            <button className="lp-btn-out" onClick={()=>setShowLanding(false)}>{session ? "Dashboard →" : "Sign In"}</button>
-            <button className="lp-btn-pri" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Get Started Free →</button>
+            {session ? (
+              <>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <div style={{background:`rgba(${userPlan==="pro"?"16,185,129":userPlan==="enterprise"?"167,139,250":"100,116,139"},.1)`,border:`1px solid rgba(${userPlan==="pro"?"16,185,129":userPlan==="enterprise"?"167,139,250":"100,116,139"},.2)`,borderRadius:8,padding:"4px 10px",fontSize:11,fontWeight:700,color:PLANS[userPlan]?.color}}>
+                    {PLANS[userPlan]?.name} Plan
+                  </div>
+                  <div onClick={()=>setShowLanding(false)} style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#a78bfa,#10b981)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,color:"#fff",cursor:"pointer",border:"2px solid rgba(255,255,255,.15)",transition:"all .2s",flexShrink:0}}
+                    onMouseEnter={e=>e.currentTarget.style.transform="scale(1.08)"}
+                    onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
+                    {(profile?.full_name||session.user.email||"U")[0].toUpperCase()}
+                  </div>
+                </div>
+                <button className="lp-btn-pri" onClick={()=>setShowLanding(false)}>Dashboard →</button>
+              </>
+            ) : (
+              <>
+                <button className="lp-btn-out" onClick={()=>setShowLanding(false)}>Sign In</button>
+                <button className="lp-btn-pri" onClick={()=>{setShowLanding(false);setAuthMode("register")}}>Get Started Free →</button>
+              </>
+            )}
           </div>
         </nav>
 
@@ -2690,6 +2715,19 @@ export default function App() {
               <div key={l} className="dbar"><span className="dbar-lbl" style={{color:c}}>{l}</span><div className="dbar-track"><div className="dbar-fill" style={{width:active.length>0?`${Math.round((n/active.length)*100)}%`:"0%",background:c}}/></div><span className="dbar-n" style={{color:c}}>{n}</span></div>
             ))}
           </div>
+          {PLANS[userPlan]?.limit_apps < 9999 && (
+            <div style={{marginTop:10,fontSize:10,color:"var(--text3)"}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+                <span>Plan limit</span>
+                <span style={{fontWeight:700,color:active.length >= PLANS[userPlan].limit_apps ? "#ef4444" : "var(--text2)"}}>
+                  {active.length}/{PLANS[userPlan].limit_apps} apps
+                </span>
+              </div>
+              <div style={{height:3,background:"var(--border)",borderRadius:2,overflow:"hidden"}}>
+                <div style={{height:"100%",borderRadius:2,background:active.length >= PLANS[userPlan].limit_apps ? "#ef4444" : "#10b981",width:`${Math.min((active.length/PLANS[userPlan].limit_apps)*100,100)}%`,transition:"width .6s"}}/>
+              </div>
+            </div>
+          )}
         </div>
         <div className="kpi" onClick={()=>setPage("soc2")}>
           <div className="kpi-lbl">{t.complianceGaps}</div>
@@ -2832,11 +2870,14 @@ export default function App() {
           </div>
         </div>
         <div className="sb-footer">
-          <button onClick={()=>window.open(`${LS_PRO_URL}`,"_blank")} style={{width:"100%",marginBottom:10,padding:"9px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#10b981,#059669)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,transition:"all .2s"}}
+          {userPlan === "free" && <button onClick={()=>window.open(LS_PRO_URL,"_blank")} style={{width:"100%",marginBottom:10,padding:"9px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#10b981,#059669)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,transition:"all .2s"}}
             onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(16,185,129,.4)"}
             onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
             ⚡ Upgrade to Pro
-          </button>
+          </button>}
+          {userPlan !== "free" && <div style={{marginBottom:10,padding:"8px 12px",borderRadius:10,background:`rgba(${userPlan==="pro"?"16,185,129":"167,139,250"},.1)`,border:`1px solid rgba(${userPlan==="pro"?"16,185,129":"167,139,250"},.2)`,textAlign:"center",fontSize:12,fontWeight:700,color:PLANS[userPlan]?.color}}>
+            {PLANS[userPlan]?.name} Plan ✓
+          </div>}
           <div className="sb-user">
             <div className="sb-av" onClick={()=>setPage("profile")} style={{overflow:"hidden",padding:0,flexShrink:0}}>
               {(() => {
