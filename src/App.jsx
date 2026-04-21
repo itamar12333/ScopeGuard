@@ -5,7 +5,7 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://uqrqfwhvchpcm
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
-const LS_PRO_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/0eb1490c-5bb3-438f-b1a1-c068759031f9";
+const GOOGLE_CLIENT_ID = "515432458343-9ur5ov4m0vvii0vet43tvv7vnvis7vev.apps.googleusercontent.com";
 const LS_ENT_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/0eb1490c-5bb3-438f-b1a1-c068759031f9";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -170,15 +170,17 @@ html.dark{
 
 /* KPI */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all .2s;animation:fadeIn .4s ease both}
-.kpi:hover{border-color:#10b981;box-shadow:0 4px 20px rgba(16,185,129,.1);transform:translateY(-2px)}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all .2s;animation:fadeIn .4s ease both;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(16,185,129,.03),transparent);opacity:0;transition:.2s}
+.kpi:hover{border-color:#10b981;box-shadow:0 8px 24px rgba(16,185,129,.12);transform:translateY(-3px)}
+.kpi:hover::before{opacity:1}
 .kpi:nth-child(1){animation-delay:.05s}
 .kpi:nth-child(2){animation-delay:.1s}
 .kpi:nth-child(3){animation-delay:.15s}
 .kpi:nth-child(4){animation-delay:.2s}
-.kpi-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
-.kpi-val{font-size:32px;font-weight:900;color:var(--text);line-height:1;animation:countUp .5s ease both}
-.kpi-sub{font-size:11px;color:var(--text3);margin-top:5px}
+.kpi-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.kpi-val{font-size:34px;font-weight:900;color:var(--text);line-height:1;letter-spacing:-1px}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:6px;display:flex;align-items:center;gap:4px}
 .ring-wrap{display:flex;align-items:center;gap:12px}
 .ring{position:relative;width:56px;height:56px;flex-shrink:0}
 .ring svg{width:56px;height:56px}
@@ -195,11 +197,12 @@ html.dark{
 
 /* CARDS */
 .mid-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;animation:fadeIn .4s ease both}
-.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.card-title{font-size:13px;font-weight:700;color:var(--text)}
-.card-link{font-size:11px;font-weight:700;color:#10b981;cursor:pointer;transition:.15s}
-.card-link:hover{color:#059669}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;animation:fadeIn .4s ease both;transition:box-shadow .2s}
+.card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px}
+.card-link{font-size:11px;font-weight:700;color:#10b981;cursor:pointer;transition:.15s;padding:3px 8px;border-radius:6px}
+.card-link:hover{background:rgba(16,185,129,.1)}
 
 /* ALERTS */
 .al-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border2);animation:slideIn .3s ease both}
@@ -1187,7 +1190,13 @@ export default function App() {
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`;
   };
 
-  const connectSlack = () => {
+  const connectGoogle = () => {
+    if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing."); return; }
+    const redirectUri = `https://uqrqfwhvchpcmzrfqoyd.supabase.co/functions/v1/google-oauth`;
+    const scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/admin.reports.audit.readonly";
+    const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}&access_type=offline&prompt=consent`;
+  };
     if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing."); return; }
     const redirectUri = `https://uqrqfwhvchpcmzrfqoyd.supabase.co/functions/v1/slack-oauth`;
     const scope = "channels:read,groups:read,team:read,users:read";
@@ -1298,19 +1307,19 @@ export default function App() {
         }
       }
 
-      if (platformName === "Slack") {
+      if (platformName === "Slack" || platformName === "Google Workspace") {
+        const fnName = platformName === "Slack" ? "slack-scan" : "google-scan";
         const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
-        const res = await fetch(`${SB_URL}/functions/v1/slack-scan`, {
+        const res = await fetch(`${SB_URL}/functions/v1/${fnName}`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
           body: JSON.stringify({ org_id: profile.org_id, platform_id: platform.id }),
         });
         const data = await res.json();
-        console.log("Slack scan result:", data);
-        // Update platforms and reload
+        console.log(`${platformName} scan result:`, data);
         await supabase.from("platforms").update({ last_synced_at: new Date().toISOString() }).eq("id", platform.id);
-        showToast(`✓ Slack scan complete — ${data.apps_found || 0} apps found`);
+        showToast(`✓ ${platformName} scan complete — ${data.apps_found || 0} apps found`);
         setPlatforms(prev => prev.map(p => p.id === platform.id ? { ...p, last_synced_at: new Date().toISOString() } : p));
         const { data: newApps } = await supabase
           .from("connected_apps")
@@ -2063,7 +2072,7 @@ export default function App() {
     const integrationDefs = [
       { name:"GitHub", icon:"🐙", color:"#24292e", desc:"Discover all OAuth apps and GitHub App installations connected to your organization's repositories.", onConnect:connectGitHub },
       { name:"Slack", icon:"💬", color:"#4A154B", desc:"Find all apps installed in your Slack workspace, including their scopes and access levels.", onConnect:connectSlack },
-      { name:"Google Workspace", icon:"🔵", color:"#0f9d58", desc:"Scan all third-party apps connected to your Google Workspace via OAuth.", onConnect:()=>showToast("Coming soon!") },
+      { name:"Google Workspace", icon:"🔵", color:"#0f9d58", desc:"Scan all third-party apps connected to your Google Workspace via OAuth.", onConnect:connectGoogle },
       { name:"Salesforce", icon:"☁️", color:"#00A1E0", desc:"Identify Connected Apps and OAuth integrations in your Salesforce org.", onConnect:()=>showToast("Coming soon!") },
     ];
 
@@ -2901,4 +2910,4 @@ export default function App() {
     <div className={`toast ${toast.show?"show":""}`}><div className="toast-icon">✓</div>{toast.msg}</div>
     </>
   );
-}
+
