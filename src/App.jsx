@@ -2075,7 +2075,7 @@ export default function App() {
                       </button>
                   }
                 </div>
-                {connected&&<div className="int-apps-found">✓ {apps.filter(a=>a.platform?.name===int.name).length} apps found</div>}
+                {connected && connected.last_synced_at && <div className="int-apps-found">✓ {apps.filter(a=>a.platform?.name===int.name&&!a.is_revoked).length} apps found</div>}
               </div>
             );
           })}
