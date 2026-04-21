@@ -5,7 +5,6 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://uqrqfwhvchpcm
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
-
 const LS_PRO_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/0eb1490c-5bb3-438f-b1a1-c068759031f9";
 const LS_ENT_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/0eb1490c-5bb3-438f-b1a1-c068759031f9";
 
@@ -1355,7 +1354,7 @@ export default function App() {
         fetch(`${SB_URL}/functions/v1/send-alert-email`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
-          body: JSON.stringify({ org_id: profile.org_id, alert_id: newAlerts[0].id }),
+          body: JSON.stringify({ org_id: profile.org_id, alert_id: newAlerts[0].id, user_email: session?.user?.email }),
         }).catch(() => {});
       }
 
@@ -1746,14 +1745,14 @@ export default function App() {
             <div className="lp-price pop">
               <div className="lp-price-badge">MOST POPULAR</div>
               <div className="lp-price-name">Pro</div>
-              <div className="lp-price-amount"><span>$</span>39.99</div>
+              <div className="lp-price-amount"><span>$</span>39</div>
               <div className="lp-price-period">per month · 14-day free trial</div>
               <div className="lp-price-feats">{["Unlimited apps","GitHub & Slack scanning","SOC 2 & GDPR mapping","One-click revocation","PDF audit reports","Risk timeline","10 team members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
               <button className="lp-price-btn lp-price-btn-green" onClick={()=>window.open(`${LS_PRO_URL}`,"_blank")}>Start free trial →</button>
             </div>
             <div className="lp-price">
               <div className="lp-price-name">Enterprise</div>
-              <div className="lp-price-amount"><span>$</span>149.99</div>
+              <div className="lp-price-amount"><span>$</span>150</div>
               <div className="lp-price-period">per month · 14-day free trial</div>
               <div className="lp-price-feats">{["Everything in Pro","Unlimited platforms","ISO 27001 mapping","SSO & user management","Dedicated account manager","SLA guarantee","Unlimited members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
               <button className="lp-price-btn lp-price-btn-out" onClick={()=>window.open(`${LS_ENT_URL}`,"_blank")}>Start free trial →</button>
@@ -2099,9 +2098,24 @@ export default function App() {
                 <div style={{display:"flex",gap:8}}>
                   {!connected
                     ?<button className="int-btn connect" onClick={int.onConnect}><Icon name="link" size={14} color="#fff"/> {int.name==="GitHub"?t.connectGithub:int.name==="Slack"?t.connectSlack:`Connect ${int.name}`}</button>
-                    :<button className={`int-btn ${isScanning?"scanning":"scan"}`} style={{flex:1}} onClick={()=>triggerScan(int.name)} disabled={isScanning}>
+                    :<>
+                      <button className={`int-btn ${isScanning?"scanning":"scan"}`} style={{flex:1}} onClick={()=>triggerScan(int.name)} disabled={isScanning}>
                         {isScanning?<><div className="spinner" style={{width:14,height:14,border:"2px solid #e2e8f0",borderTopColor:"#10b981"}}/> {t.scanning}</>:<><Icon name="check" size={14} color="#fff"/> {t.scanNow}</>}
                       </button>
+                      <button onClick={async()=>{
+                        if(!window.confirm(`Disconnect ${int.name}? This will remove the integration and all scanned data.`)) return;
+                        await supabase.from("connected_apps").delete().eq("org_id", profile.org_id).eq("platform_id", connected.id);
+                        await supabase.from("platform_tokens").delete().eq("org_id", profile.org_id).eq("platform", int.name.toLowerCase());
+                        await supabase.from("platforms").delete().eq("id", connected.id);
+                        setPlatforms(prev => prev.filter(p => p.id !== connected.id));
+                        setApps(prev => prev.filter(a => a.platform?.name !== int.name));
+                        showToast(`${int.name} disconnected`);
+                      }} style={{padding:"0 14px",height:42,borderRadius:10,border:"1px solid rgba(239,68,68,.3)",background:"rgba(239,68,68,.08)",color:"#ef4444",fontSize:12,fontWeight:700,cursor:"pointer",transition:"all .15s",flexShrink:0,display:"flex",alignItems:"center",gap:5}}
+                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,.18)";e.currentTarget.style.borderColor="rgba(239,68,68,.5)"}}
+                        onMouseLeave={e=>{e.currentTarget.style.background="rgba(239,68,68,.08)";e.currentTarget.style.borderColor="rgba(239,68,68,.3)"}}>
+                        ✕ Disconnect
+                      </button>
+                    </>
                   }
                 </div>
                 {connected && connected.last_synced_at && <div className="int-apps-found">✓ {apps.filter(a=>a.platform?.name===int.name&&!a.is_revoked).length} apps found</div>}

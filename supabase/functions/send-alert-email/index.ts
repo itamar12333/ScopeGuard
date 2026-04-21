@@ -15,17 +15,25 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   try {
-    const { org_id, alert_id, type } = await req.json();
+    const { org_id, alert_id, user_email } = await req.json();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-    // Get org and profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("email, full_name")
-      .eq("org_id", org_id)
-      .single();
+    // Use provided email or find from org
+    let email = user_email;
+    let fullName = "";
+    if (!email) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("email, full_name")
+        .eq("org_id", org_id)
+        .not("email", "is", null)
+        .limit(1)
+        .single();
+      email = profile?.email;
+      fullName = profile?.full_name || "";
+    }
 
-    if (!profile?.email) throw new Error("No email found");
+    if (!email) throw new Error("No email found");
 
     // Get alert details
     const { data: alert } = await supabase
@@ -90,8 +98,8 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "ScopeGuard <alerts@scopguard.com>",
-        to: [profile.email],
+        from: "ScopeGuard <alerts@send.scopguard.com>",
+        to: [email],
         subject: `⚠️ [${severityLabel}] ${alert?.title || "Security Alert"} — ScopeGuard`,
         html,
       }),
