@@ -1297,47 +1297,15 @@ export default function App() {
       }
 
       if (platformName === "Slack") {
-        const slHeaders = { Authorization: `Bearer ${token}` };
-
-        // Get installed apps
-        const appsRes = await fetch("https://slack.com/api/apps.event.authorizations.list?limit=200", { headers: slHeaders });
-        
-        // Get team info
-        const teamRes = await fetch("https://slack.com/api/team.info", { headers: slHeaders });
-        const teamData = await teamRes.json();
-        const teamName = teamData.team?.name || "Slack Workspace";
-
-        // Get users count
-        const usersRes = await fetch("https://slack.com/api/users.list?limit=1", { headers: slHeaders });
-        const usersData = await usersRes.json();
-        const memberCount = usersData.response_metadata?.total_count || usersData.members?.length || 1;
-
-        // Get bots (installed apps)
-        const botsRes = await fetch("https://slack.com/api/users.list?types=bot&limit=100", { headers: slHeaders });
-        const botsData = await botsRes.json();
-        const bots = (botsData.members || []).filter((m) => m.is_bot && !m.deleted && m.name !== "slackbot");
-
-        for (const bot of bots) {
-          const daysSince = Math.floor((Date.now() - (bot.updated || 0) * 1000) / 86400000);
-          const isVerified = bot.profile?.api_app_id ? true : false;
-          const score = isVerified ? 35 : 60;
-          appsToSave.push({
-            org_id: profile.org_id, platform_id: platform.id,
-            name: bot.real_name || bot.name,
-            publisher: bot.profile?.real_name_normalized || "Unknown",
-            verified: isVerified,
-            connection_type: "Slack Bot",
-            risk_score: score,
-            severity: score >= 60 ? "high" : score >= 35 ? "medium" : "low",
-            users_affected: memberCount,
-            users_type: "users",
-            is_stale: daysSince > 90,
-            is_revoked: false,
-            last_active_at: bot.updated ? new Date(bot.updated * 1000).toISOString() : new Date().toISOString(),
-            connected_at: new Date().toISOString(),
-            notes: `Slack Bot | Workspace: ${teamName} | Members: ${memberCount}`,
-          });
-        }
+        const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
+        const res = await fetch(`${SB_URL}/functions/v1/slack-scan`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
+          body: JSON.stringify({ org_id: profile.org_id, platform_id: platform.id }),
+        });
+        const data = await res.json();
+        console.log("Slack scan result:", data);
       }
       for (const app of appsToSave) {
         const { data: existing } = await supabase
