@@ -1197,6 +1197,7 @@ export default function App() {
     const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}&access_type=offline&prompt=consent`;
   };
+  const connectSlack = () => {
     if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing."); return; }
     const redirectUri = `https://uqrqfwhvchpcmzrfqoyd.supabase.co/functions/v1/slack-oauth`;
     const scope = "channels:read,groups:read,team:read,users:read";
@@ -2910,4 +2911,4 @@ export default function App() {
     <div className={`toast ${toast.show?"show":""}`}><div className="toast-icon">✓</div>{toast.msg}</div>
     </>
   );
-
+}
