@@ -1193,7 +1193,7 @@ export default function App() {
   const connectGoogle = () => {
     if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing."); return; }
     const redirectUri = `https://uqrqfwhvchpcmzrfqoyd.supabase.co/functions/v1/google-oauth`;
-    const scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/admin.reports.audit.readonly";
+    const scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid";
     const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}&access_type=offline&prompt=consent`;
   };
