@@ -6,7 +6,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJ
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
 
-
 const LS_PRO_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/0eb1490c-5bb3-438f-b1a1-c068759031f9";
 const LS_ENT_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/0eb1490c-5bb3-438f-b1a1-c068759031f9";
 
@@ -1342,6 +1341,24 @@ export default function App() {
 
       showToast(`✓ ${platformName} scan complete — ${appsToSave.length} apps found`);
 
+      // Send email alerts for critical findings
+      const { data: newAlerts } = await supabase
+        .from("alerts")
+        .select("id, severity")
+        .eq("org_id", profile.org_id)
+        .eq("status", "open")
+        .in("severity", ["critical", "high"]);
+
+      if (newAlerts && newAlerts.length > 0) {
+        const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
+        fetch(`${SB_URL}/functions/v1/send-alert-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
+          body: JSON.stringify({ org_id: profile.org_id, alert_id: newAlerts[0].id }),
+        }).catch(() => {});
+      }
+
       // Reload data
       setPlatforms(prev => prev.map(p => p.id === platform.id ? { ...p, last_synced_at: new Date().toISOString() } : p));
       const { data: newApps } = await supabase
@@ -1729,14 +1746,14 @@ export default function App() {
             <div className="lp-price pop">
               <div className="lp-price-badge">MOST POPULAR</div>
               <div className="lp-price-name">Pro</div>
-              <div className="lp-price-amount"><span>$</span>39.99</div>
+              <div className="lp-price-amount"><span>$</span>39</div>
               <div className="lp-price-period">per month · 14-day free trial</div>
               <div className="lp-price-feats">{["Unlimited apps","GitHub & Slack scanning","SOC 2 & GDPR mapping","One-click revocation","PDF audit reports","Risk timeline","10 team members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
               <button className="lp-price-btn lp-price-btn-green" onClick={()=>window.open(`${LS_PRO_URL}`,"_blank")}>Start free trial →</button>
             </div>
             <div className="lp-price">
               <div className="lp-price-name">Enterprise</div>
-              <div className="lp-price-amount"><span>$</span>149.99</div>
+              <div className="lp-price-amount"><span>$</span>150</div>
               <div className="lp-price-period">per month · 14-day free trial</div>
               <div className="lp-price-feats">{["Everything in Pro","Unlimited platforms","ISO 27001 mapping","SSO & user management","Dedicated account manager","SLA guarantee","Unlimited members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
               <button className="lp-price-btn lp-price-btn-out" onClick={()=>window.open(`${LS_ENT_URL}`,"_blank")}>Start free trial →</button>
