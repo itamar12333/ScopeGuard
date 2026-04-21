@@ -1211,11 +1211,12 @@ export default function App() {
     setScanningPlatform(platformName);
     try {
       // Get token from Supabase directly
+      const tokenKey = platformName === "Google Workspace" ? "google" : platformName.toLowerCase();
       const { data: tokenRow } = await supabase
         .from("platform_tokens")
         .select("access_token")
         .eq("org_id", profile.org_id)
-        .eq("platform", platformName.toLowerCase())
+        .eq("platform", tokenKey)
         .single();
 
       if (!tokenRow?.access_token) throw new Error("No token found. Please reconnect.");
