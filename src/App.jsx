@@ -1605,7 +1605,7 @@ export default function App() {
                   <div style={{background:`rgba(${userPlan==="pro"?"16,185,129":userPlan==="enterprise"?"167,139,250":"100,116,139"},.1)`,border:`1px solid rgba(${userPlan==="pro"?"16,185,129":userPlan==="enterprise"?"167,139,250":"100,116,139"},.2)`,borderRadius:8,padding:"4px 10px",fontSize:11,fontWeight:700,color:PLANS[userPlan]?.color}}>
                     {PLANS[userPlan]?.name} Plan
                   </div>
-                  <div onClick={()=>setShowLanding(false)} style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#a78bfa,#10b981)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,color:"#fff",cursor:"pointer",border:"2px solid rgba(255,255,255,.15)",transition:"all .2s",flexShrink:0}}
+                  <div onClick={()=>{setShowLanding(false);setPage("profile")}} style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#a78bfa,#10b981)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,color:"#fff",cursor:"pointer",border:"2px solid rgba(255,255,255,.15)",transition:"all .2s",flexShrink:0}}
                     onMouseEnter={e=>e.currentTarget.style.transform="scale(1.08)"}
                     onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
                     {(profile?.full_name||session.user.email||"U")[0].toUpperCase()}
