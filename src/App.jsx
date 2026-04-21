@@ -1746,14 +1746,14 @@ export default function App() {
             <div className="lp-price pop">
               <div className="lp-price-badge">MOST POPULAR</div>
               <div className="lp-price-name">Pro</div>
-              <div className="lp-price-amount"><span>$</span>39</div>
+              <div className="lp-price-amount"><span>$</span>39.99</div>
               <div className="lp-price-period">per month · 14-day free trial</div>
               <div className="lp-price-feats">{["Unlimited apps","GitHub & Slack scanning","SOC 2 & GDPR mapping","One-click revocation","PDF audit reports","Risk timeline","10 team members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
               <button className="lp-price-btn lp-price-btn-green" onClick={()=>window.open(`${LS_PRO_URL}`,"_blank")}>Start free trial →</button>
             </div>
             <div className="lp-price">
               <div className="lp-price-name">Enterprise</div>
-              <div className="lp-price-amount"><span>$</span>150</div>
+              <div className="lp-price-amount"><span>$</span>149.99</div>
               <div className="lp-price-period">per month · 14-day free trial</div>
               <div className="lp-price-feats">{["Everything in Pro","Unlimited platforms","ISO 27001 mapping","SSO & user management","Dedicated account manager","SLA guarantee","Unlimited members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
               <button className="lp-price-btn lp-price-btn-out" onClick={()=>window.open(`${LS_ENT_URL}`,"_blank")}>Start free trial →</button>
