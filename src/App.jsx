@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
-
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || "Ov23liG47Hl2rb25GTRx";
 const SLACK_CLIENT_ID = import.meta.env.VITE_SLACK_CLIENT_ID || "10931107133861.10932502957734";
+
+const LS_PRO_VARIANT = "1558197";
+const LS_ENT_VARIANT = "1558227";
+const LS_STORE = "scopeguard";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1713,7 +1716,7 @@ export default function App() {
         <div className="lp-pricing">
           <div className="lp-sec-label">Pricing</div>
           <div className="lp-sec-title">Simple, transparent pricing</div>
-          <div className="lp-sec-sub">No hidden fees. Cancel anytime. Start free.</div>
+          <div className="lp-sec-sub">14-day free trial. No credit card required. Cancel anytime.</div>
           <div className="lp-pricing-grid">
             <div className="lp-price">
               <div className="lp-price-name">Starter</div>
@@ -1725,17 +1728,17 @@ export default function App() {
             <div className="lp-price pop">
               <div className="lp-price-badge">MOST POPULAR</div>
               <div className="lp-price-name">Pro</div>
-              <div className="lp-price-amount"><span>$</span>149</div>
-              <div className="lp-price-period">per month, billed annually</div>
-              <div className="lp-price-feats">{["Unlimited apps","All platforms","SOC 2 & GDPR","Slack & email alerts","PDF reports","Risk timeline","10 team members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
-              <button className="lp-price-btn lp-price-btn-green" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Start Pro trial →</button>
+              <div className="lp-price-amount"><span>$</span>49</div>
+              <div className="lp-price-period">per month · 14-day free trial</div>
+              <div className="lp-price-feats">{["Unlimited apps","GitHub & Slack scanning","SOC 2 & GDPR mapping","One-click revocation","PDF audit reports","Risk timeline","10 team members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
+              <button className="lp-price-btn lp-price-btn-green" onClick={()=>window.open(`https://scopeguard.lemonsqueezy.com/buy/${LS_PRO_VARIANT}`,"_blank")}>Start free trial →</button>
             </div>
             <div className="lp-price">
               <div className="lp-price-name">Enterprise</div>
-              <div className="lp-price-amount" style={{fontSize:32}}>Custom</div>
-              <div className="lp-price-period">Volume pricing available</div>
-              <div className="lp-price-feats">{["Everything in Pro","SSO / SAML","Custom integrations","Dedicated CSM","SLA guarantee","Unlimited members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
-              <button className="lp-price-btn lp-price-btn-out">Contact sales</button>
+              <div className="lp-price-amount"><span>$</span>199</div>
+              <div className="lp-price-period">per month · 14-day free trial</div>
+              <div className="lp-price-feats">{["Everything in Pro","Unlimited platforms","ISO 27001 mapping","SSO & user management","Dedicated account manager","SLA guarantee","Unlimited members"].map(f=><div key={f} className="lp-price-feat"><span className="lp-price-check">✓</span>{f}</div>)}</div>
+              <button className="lp-price-btn lp-price-btn-out" onClick={()=>window.open(`https://scopeguard.lemonsqueezy.com/buy/${LS_ENT_VARIANT}`,"_blank")}>Start free trial →</button>
             </div>
           </div>
         </div>
@@ -2780,6 +2783,11 @@ export default function App() {
           </div>
         </div>
         <div className="sb-footer">
+          <button onClick={()=>window.open(`https://scopeguard.lemonsqueezy.com/buy/${LS_PRO_VARIANT}`,"_blank")} style={{width:"100%",marginBottom:10,padding:"9px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#10b981,#059669)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,transition:"all .2s"}}
+            onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(16,185,129,.4)"}
+            onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
+            ⚡ Upgrade to Pro
+          </button>
           <div className="sb-user">
             <div className="sb-av" onClick={()=>setPage("profile")} style={{overflow:"hidden",padding:0,flexShrink:0}}>
               {(() => {
