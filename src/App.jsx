@@ -766,13 +766,15 @@ export default function App() {
   const [authErr, setAuthErr] = useState("");
   const [showLanding, setShowLanding] = useState(() => {
     if (localStorage.getItem("sg-after-oauth")) return false;
+    if (localStorage.getItem("sg-session-active") === "1") return false;
     return true;
   });
-  const [page, setPage] = useState(() => {
+  const [page, setPageState] = useState(() => {
     const afterOAuth = localStorage.getItem("sg-after-oauth");
     if (afterOAuth) { localStorage.removeItem("sg-after-oauth"); return afterOAuth; }
-    return "dashboard";
+    return localStorage.getItem("sg-current-page") || "dashboard";
   });
+  const setPage = (p) => { setPageState(p); localStorage.setItem("sg-current-page", p); };
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [fullName, setFullName] = useState("");
@@ -889,10 +891,18 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s || null);
       setAppLoading(false);
+      if (s) {
+        localStorage.setItem("sg-session-active", "1");
+        setShowLanding(false);
+      } else {
+        localStorage.removeItem("sg-session-active");
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s || null);
+      if (s) localStorage.setItem("sg-session-active", "1");
+      else localStorage.removeItem("sg-session-active");
     });
 
     return () => subscription.unsubscribe();
@@ -1176,12 +1186,11 @@ export default function App() {
   };
 
   const connectSlack = () => {
-    console.log("connectSlack - org_id:", profile?.org_id, "user_id:", session?.user?.id);
-    if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing the page."); return; }
-    const redirectUri = `${window.location.origin}/auth/slack/callback`;
+    if (!profile?.org_id) { alert("Error: missing org_id. Try refreshing."); return; }
+    const redirectUri = `https://uqrqfwhvchpcmzrfqoyd.supabase.co/functions/v1/slack-oauth`;
     const scope = "channels:read,groups:read,team:read,users:read";
     const state = btoa(JSON.stringify({ user_id: session.user.id, org_id: profile.org_id }));
-    window.location.href = `https://slack.com/oauth/v2/authorize?client_id=${SLACK_CLIENT_ID}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+    window.location.href = `https://slack.com/oauth/v2/authorize?client_id=${SLACK_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`;
   };
 
   const triggerScan = async (platformName) => {
@@ -1391,6 +1400,12 @@ export default function App() {
         .lp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 6% 70px;position:relative}
         .lp-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 16px;border-radius:20px;border:1px solid rgba(167,139,250,.3);background:rgba(167,139,250,.08);font-size:12px;font-weight:600;color:#a78bfa;margin-bottom:28px}
         .lp-badge-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 2s ease-in-out infinite}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .lp-badge{animation:fadeInUp .6s ease both}
+        .lp-h1{animation:fadeInUp .6s ease .1s both}
+        .lp-sub{animation:fadeInUp .6s ease .2s both}
+        .lp-ctas{animation:fadeInUp .6s ease .3s both}
         .lp-h1{font-size:clamp(38px,6vw,72px);font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:22px;max-width:820px}
         .lp-h1 .gr{background:linear-gradient(135deg,#a78bfa,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .lp-sub{font-size:clamp(15px,2vw,19px);color:rgba(255,255,255,.55);max-width:540px;margin-bottom:40px;line-height:1.7}
@@ -1531,11 +1546,37 @@ export default function App() {
             <button className="lp-cta-pri" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Start securing for free →</button>
             <button className="lp-cta-sec" onClick={enterDemo}>🚀 Try live demo</button>
           </div>
-          <div className="lp-stats">
-            <div><div className="lp-stat-n">137</div><div className="lp-stat-l">avg apps per company</div></div>
-            <div><div className="lp-stat-n">68%</div><div className="lp-stat-l">never audited</div></div>
-            <div><div className="lp-stat-n">$4.5M</div><div className="lp-stat-l">avg cost of SaaS breach</div></div>
-            <div><div className="lp-stat-n">90s</div><div className="lp-stat-l">to first scan</div></div>
+          <div className="lp-stats" style={{animation:"fadeInUp .8s ease .4s both"}}>
+            {[
+              {end:137, suffix:"", prefix:"", label:"avg apps per company"},
+              {end:68, suffix:"%", prefix:"", label:"never audited"},
+              {end:4.5, suffix:"M", prefix:"$", label:"avg cost of SaaS breach", isFloat:true},
+              {end:90, suffix:"s", prefix:"", label:"to first scan"},
+            ].map(({end,suffix,prefix,label,isFloat}) => {
+              const Counter = () => {
+                const [val, setVal] = useState(0);
+                const [started, setStarted] = useState(false);
+                const ref = useRef(null);
+                useEffect(() => {
+                  const obs = new IntersectionObserver(([e]) => { if(e.isIntersecting) setStarted(true); }, {threshold:0.5});
+                  if(ref.current) obs.observe(ref.current);
+                  return () => obs.disconnect();
+                }, []);
+                useEffect(() => {
+                  if(!started) return;
+                  let cur = 0;
+                  const steps = 50;
+                  const timer = setInterval(() => {
+                    cur += end/steps;
+                    if(cur >= end) { setVal(end); clearInterval(timer); }
+                    else setVal(isFloat ? Math.round(cur*10)/10 : Math.floor(cur));
+                  }, 30);
+                  return () => clearInterval(timer);
+                }, [started]);
+                return <div ref={ref}><div className="lp-stat-n">{prefix}{isFloat ? val.toFixed(1) : val}{suffix}</div><div className="lp-stat-l">{label}</div></div>;
+              };
+              return <Counter key={label}/>;
+            })}
           </div>
         </div>
 
