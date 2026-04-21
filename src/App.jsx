@@ -1114,12 +1114,51 @@ export default function App() {
       showToast(`✓ ${app.name} revoked`);
       return;
     }
+
+    // Real revocation for GitHub
+    if (app.platform?.name === "GitHub") {
+      try {
+        const { data: tokenRow } = await supabase
+          .from("platform_tokens")
+          .select("access_token")
+          .eq("org_id", profile.org_id)
+          .eq("platform", "github")
+          .single();
+
+        if (tokenRow?.access_token) {
+          const ghHeaders = { Authorization: `Bearer ${tokenRow.access_token}`, "User-Agent": "ScopeGuard" };
+
+          // Delete webhook
+          if (app.connection_type === "Webhook" && app.notes) {
+            const repoMatch = app.notes.match(/Repo: ([^\s|]+)/);
+            if (repoMatch) {
+              const repoName = repoMatch[1];
+              const hooksRes = await fetch(`https://api.github.com/repos/${repoName}/hooks`, { headers: ghHeaders });
+              if (hooksRes.ok) {
+                const hooks = await hooksRes.json();
+                const domain = app.name.replace("Webhook → ", "");
+                for (const hook of (hooks || [])) {
+                  if ((hook.config?.url || "").includes(domain)) {
+                    await fetch(`https://api.github.com/repos/${repoName}/hooks/${hook.id}`, {
+                      method: "DELETE", headers: ghHeaders
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error("GitHub revoke error:", err);
+      }
+    }
+
     await supabase.from("connected_apps").update({ is_revoked:true, revoked_at:new Date().toISOString(), revoked_by:session.user.id }).eq("id", app.id);
     await supabase.from("revocation_log").insert({ org_id:profile.org_id, app_id:app.id, app_name:app.name, platform:app.platform?.name, performed_by:session.user.id });
     await supabase.from("alerts").update({ status:"resolved", resolved_at:new Date().toISOString() }).eq("app_id", app.id);
     setModal(null); setDetailApp(null);
     showToast(`✓ ${app.name} ${t.revokedLabel.toLowerCase()}`);
-    load();
+    load(session?.user?.id);
   };
 
   const dismissAlert = async id => {
@@ -1193,8 +1232,31 @@ export default function App() {
           });
         }
 
-        // Get webhooks per repo
+        // Add repos as monitored assets
         if (Array.isArray(repos)) {
+          for (const repo of repos) {
+            const daysSince = Math.floor((Date.now() - new Date(repo.pushed_at || repo.updated_at).getTime()) / 86400000);
+            const isPrivate = repo.private;
+            const hasAdminAccess = repo.permissions?.admin;
+            const score = isPrivate ? (hasAdminAccess ? 60 : 35) : 20;
+            appsToSave.push({
+              org_id: profile.org_id, platform_id: platform.id,
+              name: `Repo: ${repo.name}`,
+              publisher: repo.owner?.login || "GitHub",
+              verified: true,
+              connection_type: isPrivate ? "Private Repo" : "Public Repo",
+              risk_score: score,
+              severity: score >= 60 ? "high" : score >= 35 ? "medium" : "low",
+              users_affected: repo.collaborators || 1,
+              users_type: "users",
+              is_stale: daysSince > 180,
+              is_revoked: false,
+              last_active_at: repo.pushed_at || repo.updated_at,
+              connected_at: repo.created_at,
+              notes: `${isPrivate ? "Private" : "Public"} repo | ${repo.language || "No language"} | Admin: ${hasAdminAccess}`,
+            });
+          }
+        }
           for (const repo of repos.slice(0, 15)) {
             const hooksRes = await fetch(`https://api.github.com/repos/${repo.full_name}/hooks`, { headers: ghHeaders });
             if (!hooksRes.ok) continue;
