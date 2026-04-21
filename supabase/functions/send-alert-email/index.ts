@@ -15,7 +15,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   try {
-    const { org_id, alert_id, user_email } = await req.json();
+    const { org_id, alert_id, user_email, test } = await req.json();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
     // Use provided email or find from org
@@ -35,12 +35,26 @@ serve(async (req) => {
 
     if (!email) throw new Error("No email found");
 
-    // Get alert details
-    const { data: alert } = await supabase
-      .from("alerts")
-      .select("*, app:connected_apps(name, platform:platforms(name))")
-      .eq("id", alert_id)
-      .single();
+    // For test mode, use a dummy alert
+    let alert: any = null;
+    if (!test && alert_id) {
+      const { data } = await supabase
+        .from("alerts")
+        .select("*, app:connected_apps(name, platform:platforms(name))")
+        .eq("id", alert_id)
+        .single();
+      alert = data;
+    }
+    if (test || !alert) {
+      alert = {
+        title: "Test Alert: High-risk app detected",
+        detail: "This is a test email from ScopeGuard. Your email alerts are working correctly.",
+        severity: "high",
+        app: { name: "Test Application", platform: { name: "GitHub" } },
+        tags: ["test", "high-risk"],
+        compliance_ref: "SOC 2",
+      };
+    }
 
     const severityColor = alert?.severity === "critical" ? "#ef4444" : alert?.severity === "high" ? "#f59e0b" : "#3b82f6";
     const severityLabel = alert?.severity?.toUpperCase() || "ALERT";

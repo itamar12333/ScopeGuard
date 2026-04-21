@@ -2281,6 +2281,36 @@ export default function App() {
           <hr style={{border:"none",borderTop:"1px solid var(--border)"}}/>
 
           <div>
+            <div className="section-title" style={{marginBottom:10}}>📧 Email Notifications</div>
+            <div style={{background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:12,padding:16,marginBottom:16}}>
+              <div style={{fontSize:13,fontWeight:600,color:"var(--text)",marginBottom:4}}>Test email alerts</div>
+              <div style={{fontSize:12,color:"var(--text2)",marginBottom:12}}>Send a test alert to {session?.user?.email}</div>
+              <button onClick={async()=>{
+                const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
+                const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
+                showToast("Sending test email...");
+                const res = await fetch(`${SB_URL}/functions/v1/send-alert-email`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
+                  body: JSON.stringify({
+                    org_id: profile.org_id,
+                    alert_id: alerts[0]?.id || null,
+                    user_email: session?.user?.email,
+                    test: true,
+                  }),
+                });
+                const data = await res.json();
+                if (data.success) showToast("✅ Test email sent! Check your inbox.");
+                else showToast(`❌ Error: ${data.error}`);
+              }} className="btn-pri" style={{fontSize:12,padding:"8px 16px"}}>
+                Send test email →
+              </button>
+            </div>
+          </div>
+
+          <hr style={{border:"none",borderTop:"1px solid var(--border)"}}/>
+
+          <div>
             <div className="section-title" style={{marginBottom:10}}>⚠️ {t.dangerZone}</div>
             <div className="danger-zone">
               <div className="danger-title">{t.deleteAccount}</div>
