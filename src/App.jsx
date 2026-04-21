@@ -1306,6 +1306,18 @@ export default function App() {
         });
         const data = await res.json();
         console.log("Slack scan result:", data);
+        // Update platforms and reload
+        await supabase.from("platforms").update({ last_synced_at: new Date().toISOString() }).eq("id", platform.id);
+        showToast(`✓ Slack scan complete — ${data.apps_found || 0} apps found`);
+        setPlatforms(prev => prev.map(p => p.id === platform.id ? { ...p, last_synced_at: new Date().toISOString() } : p));
+        const { data: newApps } = await supabase
+          .from("connected_apps")
+          .select("*, platform:platforms(name), permissions:app_permissions(*), compliance:app_compliance_flags(framework:compliance_frameworks(name,short_code))")
+          .eq("org_id", profile.org_id)
+          .order("risk_score", { ascending: false });
+        setApps(newApps || []);
+        setScanningPlatform(null);
+        return;
       }
       for (const app of appsToSave) {
         const { data: existing } = await supabase
