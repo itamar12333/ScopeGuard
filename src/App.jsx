@@ -1256,7 +1256,8 @@ export default function App() {
               notes: `${isPrivate ? "Private" : "Public"} repo | ${repo.language || "No language"} | Admin: ${hasAdminAccess}`,
             });
           }
-        }
+
+          // Get webhooks per repo
           for (const repo of repos.slice(0, 15)) {
             const hooksRes = await fetch(`https://api.github.com/repos/${repo.full_name}/hooks`, { headers: ghHeaders });
             if (!hooksRes.ok) continue;
@@ -1286,7 +1287,6 @@ export default function App() {
         }
       }
 
-      // Save to Supabase
       // Save to Supabase - skip already revoked apps
       for (const app of appsToSave) {
         const { data: existing } = await supabase
