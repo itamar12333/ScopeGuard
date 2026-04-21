@@ -1562,7 +1562,15 @@ export default function App() {
 
         <div className="lp-hero" style={{paddingTop:110}}>
           <div className="lp-badge"><div className="lp-badge-dot"/>Real-time SaaS security scanning</div>
-          <h1 className="lp-h1">Know every app.<br/><span className="gr">Trust every connection.</span></h1>
+          <h1 className="lp-h1">
+            <span style={{display:"inline-block",animation:"fadeInUp .5s ease .1s both"}}>Know</span>{" "}
+            <span style={{display:"inline-block",animation:"fadeInUp .5s ease .2s both"}}>every</span>{" "}
+            <span style={{display:"inline-block",animation:"fadeInUp .5s ease .3s both"}}>app.</span>
+            <br/>
+            <span className="gr" style={{display:"inline-block",animation:"fadeInUp .5s ease .4s both"}}>Trust</span>{" "}
+            <span className="gr" style={{display:"inline-block",animation:"fadeInUp .5s ease .5s both"}}>every</span>{" "}
+            <span className="gr" style={{display:"inline-block",animation:"fadeInUp .5s ease .6s both"}}>connection.</span>
+          </h1>
           <p className="lp-sub">ScopeGuard automatically discovers and monitors every third-party app connected to your company — and lets you revoke dangerous access in one click.</p>
           <div className="lp-ctas">
             <button className="lp-cta-pri" onClick={()=>{setShowLanding(false);if(!session)setAuthMode("register")}}>Start securing for free →</button>
