@@ -15,7 +15,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   try {
-    const { org_id, alert_id, user_email, test } = await req.json();
+    const { org_id, alert_id, user_email, test, custom_alert } = await req.json();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
     // Use provided email or find from org
@@ -46,7 +46,7 @@ serve(async (req) => {
       alert = data;
     }
     if (test || !alert) {
-      alert = {
+      alert = custom_alert || {
         title: "Test Alert: High-risk app detected",
         detail: "This is a test email from ScopeGuard. Your email alerts are working correctly.",
         severity: "high",

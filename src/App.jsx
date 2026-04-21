@@ -1340,26 +1340,26 @@ export default function App() {
 
       showToast(`✓ ${platformName} scan complete — ${appsToSave.length} apps found`);
 
-      // Send email alerts for critical/high findings
-      const { data: newAlerts } = await supabase
-        .from("alerts")
-        .select("id, severity")
-        .eq("org_id", profile.org_id)
-        .eq("status", "open")
-        .in("severity", ["critical", "high"]);
-
-      if (newAlerts && newAlerts.length > 0) {
+      // Send email if there are high/critical risk apps
+      const highRiskApps = appsToSave.filter(a => a.severity === "critical" || a.severity === "high");
+      if (highRiskApps.length > 0) {
         const SB_URL = "https://uqrqfwhvchpcmzrfqoyd.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcnFmd2h2Y2hwY216cmZxb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTg2MjMsImV4cCI6MjA5MTkzNDYyM30.ZkEVewnjomnh7O1-Z30Luq8wbMoLvoCxmlZbt8errBs";
-        // Send email for the most critical alert
-        const topAlert = newAlerts.sort((a,b) => a.severity === "critical" ? -1 : 1)[0];
         fetch(`${SB_URL}/functions/v1/send-alert-email`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` },
           body: JSON.stringify({
             org_id: profile.org_id,
-            alert_id: topAlert.id,
             user_email: session?.user?.email,
+            test: false,
+            custom_alert: {
+              title: `${highRiskApps.length} high-risk app${highRiskApps.length > 1 ? "s" : ""} found in ${platformName}`,
+              detail: `ScopeGuard detected ${highRiskApps.length} high or critical risk integrations during your latest scan. Immediate review recommended.`,
+              severity: highRiskApps.some(a => a.severity === "critical") ? "critical" : "high",
+              app: { name: highRiskApps[0].name, platform: { name: platformName } },
+              tags: highRiskApps.slice(0,3).map(a => a.name),
+              compliance_ref: "SOC 2",
+            }
           }),
         }).catch(() => {});
       }
