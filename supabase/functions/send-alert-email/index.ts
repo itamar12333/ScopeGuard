@@ -112,7 +112,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "ScopeGuard <alerts@send.scopguard.com>",
+        from: "ScopeGuard <alerts@scopguard.com>",
         to: [email],
         subject: `⚠️ [${severityLabel}] ${alert?.title || "Security Alert"} — ScopeGuard`,
         html,
