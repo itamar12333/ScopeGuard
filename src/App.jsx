@@ -1287,7 +1287,16 @@ export default function App() {
       }
 
       // Save to Supabase
+      // Save to Supabase - skip already revoked apps
       for (const app of appsToSave) {
+        const { data: existing } = await supabase
+          .from("connected_apps")
+          .select("id, is_revoked")
+          .eq("org_id", profile.org_id)
+          .eq("platform_id", platform.id)
+          .eq("name", app.name)
+          .single();
+        if (existing?.is_revoked) continue; // skip revoked
         await supabase.from("connected_apps").upsert(app, { onConflict: "org_id,platform_id,name" });
       }
 
