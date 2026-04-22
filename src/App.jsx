@@ -1611,7 +1611,7 @@ export default function App() {
                     {(profile?.full_name||session.user.email||"U")[0].toUpperCase()}
                   </div>
                 </div>
-                <button className="lp-btn-pri" onClick={()=>setShowLanding(false)}>Dashboard →</button>
+                <button className="lp-btn-pri" onClick={()=>{setShowLanding(false);setPage("dashboard")}}>Dashboard →</button>
               </>
             ) : (
               <>
