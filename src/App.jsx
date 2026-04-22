@@ -609,8 +609,8 @@ tbody tr.rev td{opacity:.35}
   .tb-title{font-size:15px;letter-spacing:-.3px}
   .tb-sub{font-size:9px;gap:3px;flex-wrap:nowrap;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:160px}
   .tb-r{gap:6px;flex-shrink:0}
-  .btn-sec{padding:7px 10px;font-size:11px;border-radius:8px}
-  .btn-pri{padding:7px 14px;font-size:11px;border-radius:8px}
+  .tb-r .btn-sec{padding:7px 10px;font-size:14px;border-radius:9px;min-width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+  .tb-r .btn-pri{padding:7px 12px;font-size:11px;border-radius:9px;height:36px}
   .scroll-area{padding:12px 12px 80px;gap:12px}
   .sidebar{order:2;width:100%;height:58px;min-height:58px;flex-shrink:0;flex-direction:row;background:#060d1a;border-top:1px solid rgba(255,255,255,.08);border-right:none;overflow:hidden}
   .sb-brand{display:none}
@@ -2932,16 +2932,13 @@ export default function App() {
             <button className="btn-sec" onClick={()=>setShowLanding(true)} style={{fontSize:12,display:"flex",alignItems:"center",gap:5}}>
               🏠<span className="hide-mobile"> Home</span>
             </button>
-            <button className="btn-sec hide-mobile" onClick={toggleDark} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
-              {darkMode ? "☀️ Light" : "🌙 Dark"}
+            <button className="btn-sec" onClick={toggleDark} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,minWidth:36,justifyContent:"center"}}>
+              {darkMode ? "☀️" : "🌙"}<span className="hide-mobile"> {darkMode?"Light":"Dark"}</span>
             </button>
-            <button className="btn-sec hide-mobile" onClick={exportPDF} style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}>
-              📄 {t.exportPdf}
+            <button className="btn-sec" onClick={exportPDF} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,minWidth:36,justifyContent:"center"}}>
+              📄<span className="hide-mobile"> {t.exportPdf}</span>
             </button>
-            <button className="btn-sec hide-mobile" onClick={()=>setShowOnboarding(true)} style={{fontSize:12}}>
-              🚀 Setup
-            </button>
-            <button className="btn-pri" onClick={doScan} disabled={scanning} style={{fontSize:12,padding:"7px 16px"}}>{scanning?"...":t.runScan}</button>
+            <button className="btn-pri" onClick={doScan} disabled={scanning} style={{fontSize:12,padding:"7px 14px"}}>{scanning?"...":t.runScan}</button>
           </div>
         </div>
         <div className="scroll-area"><PageContent/></div>
