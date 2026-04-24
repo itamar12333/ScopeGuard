@@ -1789,10 +1789,8 @@ export default function App() {
           </div>
 
           {/* Leave a review */}
-          <div style={{marginTop:48,background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:16,padding:32,maxWidth:560,margin:"48px auto 0",textAlign:"left"}}>
-            <div style={{fontSize:16,fontWeight:800,color:"#fff",marginBottom:6}}>Leave a review ⭐</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.4)",marginBottom:20}}>Tried ScopeGuard? We'd love to hear from you.</div>
-            {(() => {
+          {(()=>{
+            const ReviewForm = () => {
               const [rName,setRName] = useState("");
               const [rRole,setRRole] = useState("");
               const [rText,setRText] = useState("");
@@ -1815,8 +1813,15 @@ export default function App() {
                   <button onClick={submit} style={{background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",padding:"11px",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer"}}>Submit Review →</button>
                 </div>
               );
-            })()}
-          </div>
+            };
+            return (
+              <div style={{marginTop:48,background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:16,padding:32,maxWidth:560,margin:"48px auto 0",textAlign:"left"}}>
+                <div style={{fontSize:16,fontWeight:800,color:"#fff",marginBottom:6}}>Leave a review ⭐</div>
+                <div style={{fontSize:13,color:"rgba(255,255,255,.4)",marginBottom:20}}>Tried ScopeGuard? We'd love to hear from you.</div>
+                <ReviewForm/>
+              </div>
+            );
+          })()}
         </div>
 
         <div className="lp-pricing">
