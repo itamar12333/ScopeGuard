@@ -1787,6 +1787,36 @@ export default function App() {
               </div>
             ))}
           </div>
+
+          {/* Leave a review */}
+          <div style={{marginTop:48,background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:16,padding:32,maxWidth:560,margin:"48px auto 0",textAlign:"left"}}>
+            <div style={{fontSize:16,fontWeight:800,color:"#fff",marginBottom:6}}>Leave a review ⭐</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.4)",marginBottom:20}}>Tried ScopeGuard? We'd love to hear from you.</div>
+            {(() => {
+              const [rName,setRName] = useState("");
+              const [rRole,setRRole] = useState("");
+              const [rText,setRText] = useState("");
+              const [rStars,setRStars] = useState(5);
+              const [rSent,setRSent] = useState(false);
+              const submit = async() => {
+                if(!rName||!rText) return;
+                await supabase.from("reviews").insert({ name:rName, role:rRole, text:rText, stars:rStars, created_at:new Date().toISOString() });
+                setRSent(true);
+              };
+              if(rSent) return <div style={{textAlign:"center",padding:"20px 0",fontSize:14,color:"#10b981",fontWeight:700}}>✅ Thank you for your review!</div>;
+              return (
+                <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                  <div style={{display:"flex",gap:4,fontSize:24,cursor:"pointer"}}>
+                    {[1,2,3,4,5].map(s=><span key={s} onClick={()=>setRStars(s)} style={{color:s<=rStars?"#f59e0b":"rgba(255,255,255,.2)",transition:".15s"}}>★</span>)}
+                  </div>
+                  <input value={rName} onChange={e=>setRName(e.target.value)} placeholder="Your name" style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:10,padding:"10px 14px",color:"#fff",fontSize:13,outline:"none"}}/>
+                  <input value={rRole} onChange={e=>setRRole(e.target.value)} placeholder="Your role (optional)" style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:10,padding:"10px 14px",color:"#fff",fontSize:13,outline:"none"}}/>
+                  <textarea value={rText} onChange={e=>setRText(e.target.value)} placeholder="What do you think about ScopeGuard?" rows={3} style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:10,padding:"10px 14px",color:"#fff",fontSize:13,outline:"none",resize:"none"}}/>
+                  <button onClick={submit} style={{background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",padding:"11px",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer"}}>Submit Review →</button>
+                </div>
+              );
+            })()}
+          </div>
         </div>
 
         <div className="lp-pricing">
@@ -2723,6 +2753,15 @@ export default function App() {
             </div>
             <div><div className="kpi-val" style={{color:scColor(sec)}}>{sec}<span style={{fontSize:14,fontWeight:500,color:"#94a3b8"}}>/100</span></div><div className="kpi-sub" style={{color:sec>=60?"#10b981":"#ef4444"}}>{sec>=60?"↑ Good posture":"↓ Needs attention"}</div></div>
           </div>
+          <button onClick={e=>{
+            e.stopPropagation();
+            const txt = `🛡️ My ScopeGuard security score is ${sec}/100!\n\nI use ScopeGuard to monitor all third-party apps connected to my organization.\n\nscopguard.com #CyberSecurity #SSPM`;
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=https://scopguard.com&summary=${encodeURIComponent(txt)}`,"_blank");
+          }} style={{marginTop:12,width:"100%",padding:"7px",borderRadius:9,border:"1px solid #0077b5",background:"rgba(0,119,181,.08)",color:"#0077b5",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:5,transition:"all .15s"}}
+            onMouseEnter={e=>e.currentTarget.style.background="rgba(0,119,181,.15)"}
+            onMouseLeave={e=>e.currentTarget.style.background="rgba(0,119,181,.08)"}>
+            🔗 Share Score on LinkedIn
+          </button>
         </div>
         <div className="kpi" onClick={()=>setPage("inventory")}>
           <div className="kpi-lbl">{t.connectedApps}</div>
