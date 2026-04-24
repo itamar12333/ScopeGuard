@@ -12,6 +12,7 @@ const PLANS = {
   pro:        { name:"Pro",        color:"#10b981", limit_apps:9999, limit_platforms:10, limit_members:10, scan_history:365, pdf:true,  soc2:true  },
   enterprise: { name:"Enterprise", color:"#a78bfa", limit_apps:9999, limit_platforms:99, limit_members:999,scan_history:365, pdf:true,  soc2:true  },
 };
+const LS_PRO_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/e1d6fc2b-bb3c-4b07-82cf-3029243add5f";
 const LS_ENT_URL = "https://scopguard.lemonsqueezy.com/checkout/buy/0eb1490c-5bb3-438f-b1a1-c068759031f9";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
